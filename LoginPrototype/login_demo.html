@@ -1,0 +1,34 @@
+<!-- @Author: Eujin Ko
+@Description: Authentication Demo on firebase with JavaScript -->
+
+
+<html>
+    <head>
+        <title>Sign Up/In</title>
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/7.22.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.22.0/firebase-auth.js"></script>
+        <script type="text/javascript" src="authentication.js"></script>
+    </head>
+
+    <body>
+        <h1> Form </h1>
+        <div id="formContainer">
+            <input type="email" placeholder="email" id="email"/>
+            <input type="password" placeholder="password" id="password"/>
+
+            <button onclick="signIn()">Sign In</button>
+            <button onclick="returnCurrentUser()">current User</button>
+            <button onclick="signOut()" >Sign Out</button>
+            <button onclick="signUp()">Sign Up</button>
+            <button onclick="verifyEmail()">verifyEmail</button>
+            <button onclick="signInGoogleAccount()">Sign In With Google</button>
+        </div>
+
+    </body>
+
+    <script>
+        
+    </script>
+
+</html>
