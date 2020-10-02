@@ -31,8 +31,43 @@ var makeSignaller = function() {
 
 
 var m_PostModel = function() {
+	// Set the configuration for your app
+  	// TODO: Replace with your project's config object
+ //  	var config = {
+ //    	apiKey: "apiKey",
+ //    	authDomain: "projectId.firebaseapp.com",
+ //    	databaseURL: "https://petshare-92cfa.firebaseio.com/",
+ //    	storageBucket: "gs://petshare-92cfa.appspot.com/"
+ //  	};
+ //  	firebase.initializeApp(config);
+	// var db = firebase.database();
+
     var _observers = makeSignaller();  // To notify observers
-    var _postList = [];
+ 	var _postList = [];
+
+ 	//Read all the posts from the database
+  //   var query = db.ref('posts');
+  //   list.once("value").then(function(snapshot) {
+  //   		snapshot.forEach(function(childSnapshot) {
+  //     		// key will be the unique key for each post
+  //     		var key = childSnapshot.key;
+  //     		 array containing child data
+  //     		*index 0 = title
+  //     		*index 1 = image
+  //     		*index 2 = comments
+  //     		*index 3 = upvotes
+  //     		*index 4 = user
+      		
+  //     		var childData = []
+  //     		childData.push(childSnapshot.child("title").val());
+  //     		childData.push(childSnapshot.child("image").val());
+  //     		childData.push(childSnapshot.child("comments").val());
+  //     		childData.push(childSnapshot.child("upvotes").val());
+  //     		childData.push(childSnapshot.child("user").val());
+
+  //     		_postList.push(childData);
+  // 			});
+		// });
 
     return {
 		// This member of the object, register, is a function that allows
@@ -45,9 +80,20 @@ var m_PostModel = function() {
 		    _observers.add(handler);
 		},
 
-		submitPost: function(post) {
-			if(post != ""){
-				_postList.push(post);
+		submitPost: function(image, title) {
+			if(image != null && title != "") {
+				// Get a key for a new Post.
+  		// 		var newPostKey = db.ref().child('posts').push().key;
+				// db.ref('posts/' + newPostKey).set({
+				// 	comments: "",
+				// 	image: image,
+				// 	title: title,
+				// 	upvotes: 0,
+				// 	user: ""
+				// });
+				var _childData = [title, image, "", 0, ""];
+				_postList.push(_childData);
+			
 			}
 			_observers.notify();
 		},
@@ -75,14 +121,26 @@ var v_PostsView = function(model, controller, elmId) {
 		while (_elm.firstChild) {
 		    _elm.removeChild(_elm.firstChild);
 		}
-
+		var reader = new FileReader();
 		// update view
 		for(var i = 0; i < list.length; i++){
 			var post = document.createElement('div'); // Create new div
-			var text = document.createElement('p');
+			var title = document.createElement('p');
+			var image = document.createElement('img');
+			image.setAttribute('id', 'image' + i);
+			
 			post.setAttribute('class', 'post');
-			text.innerHTML = list[i];
-			post.append(text);
+			title.innerHTML = list[i][0];
+			var loadFile = function(event) {
+    			image.src = URL.createObjectURL(event.target);
+    			image.onload = function() {
+      				URL.revokeObjectURL(image.src) // free memory
+    			}
+  			};
+  			loadFile(list[i][i]);
+    		
+			post.append(title);
+			post.append(image);
 		    _elm.append(post); // Add child to the parent element
 		}
     }
@@ -96,7 +154,7 @@ var v_PostsView = function(model, controller, elmId) {
     }
 }
 
-var v_submitPostButton = function(model, btn, textfield){
+var v_submitPostButton = function(model, btn, textfield, imageField){
 	var _model = model;
     var _btn = btn; // get the DOM node associated with the button
     var _textfield = textfield;
@@ -107,9 +165,11 @@ var v_submitPostButton = function(model, btn, textfield){
     _btn.addEventListener('click', function() {
 		_observers.notify({
 		    type: globals.signals.post,
-		    value: textfield.value
+		    title: textfield.value,
+		    image: imageField.files[0]
 		})
 		textfield.value = "";
+		imageField.files[0] = null;
     });
 
     return {
@@ -146,7 +206,7 @@ var c_Controller = function(model) {
 	dispatch: function(evt) {
 	    switch(evt.type) { // We will do something different depending on the event type
 		case (globals.signals.post): // This is what we do for an increment event
-		    _model.submitPost(evt.value); // We just call the model's incrementing
+		    _model.submitPost(evt.title, evt.image); // We just call the model's incrementing
 		    break;
 		default: // Unrecognized event or event not given
 		    console.log('Uncrecognized event:', evt.type); // Print what the bad value is
@@ -164,15 +224,13 @@ window.addEventListener('DOMContentLoaded', function() {
     var theModel = m_PostModel(); // We have one model
     var theController = c_Controller(theModel);
 
-    // We create views (and controls). We can have many of them. We could also
-    // quickly make duplicates. For example, you could add another div element to
-    // your HTML and put another fancy view there OR you could make another
-    // button in your HTML and have multiple increment buttons -- Try it!
+    // We create views (and controls).
     var postView = v_PostsView(theModel, theController, 'postsView');
 
     var btn = document.getElementById("submitPostButton");
     var textField = document.getElementById("composePostField");
-    var submitPostButton = v_submitPostButton(theModel, btn, textField);
+    var imageField = document.getElementById("imageField");
+    var submitPostButton = v_submitPostButton(theModel, btn, textField, fileField);
 
     // Any view needs to register a function with the model that will cause
     // the view to update when the model does
