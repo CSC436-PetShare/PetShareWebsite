@@ -31,17 +31,6 @@ var makeSignaller = function() {
 
 
 var m_PostModel = function() {
-	// Set the configuration for your app
-  	// TODO: Replace with your project's config object
-  	var config = {
-    	apiKey: "apiKey",
-    	authDomain: "projectId.firebaseapp.com",
-    	databaseURL: "https://petshare-92cfa.firebaseio.com/",
-    	storageBucket: "bucket.appspot.com"
-  	};
-  	firebase.initializeApp(config);
-	var db = firebase.database();
-
     var _observers = makeSignaller();  // To notify observers
     var _postList = [];
 
@@ -56,18 +45,9 @@ var m_PostModel = function() {
 		    _observers.add(handler);
 		},
 
-		submitPost: function(image, title) {
-			if(image != null && title != "") {
-				// Get a key for a new Post.
-  				var newPostKey = db.ref().child('posts').push().key;
-				db.ref('posts/' + newPostKey).set({
-					comments: "",
-					image: image,
-					title: title,
-					upvotes: 0,
-					user: ""
-				})
-			}
+		submitPost: function(post) {
+			if(post != ""){
+				_postList.push(post);
 			}
 			_observers.notify();
 		},
@@ -116,7 +96,7 @@ var v_PostsView = function(model, controller, elmId) {
     }
 }
 
-var v_submitPostButton = function(model, btn, textfield, imageField){
+var v_submitPostButton = function(model, btn, textfield){
 	var _model = model;
     var _btn = btn; // get the DOM node associated with the button
     var _textfield = textfield;
@@ -127,11 +107,9 @@ var v_submitPostButton = function(model, btn, textfield, imageField){
     _btn.addEventListener('click', function() {
 		_observers.notify({
 		    type: globals.signals.post,
-		    title: textfield.value,
-		    image: imageFiledField.value
+		    value: textfield.value
 		})
 		textfield.value = "";
-		imageField.value = null;
     });
 
     return {
@@ -168,7 +146,7 @@ var c_Controller = function(model) {
 	dispatch: function(evt) {
 	    switch(evt.type) { // We will do something different depending on the event type
 		case (globals.signals.post): // This is what we do for an increment event
-		    _model.submitPost(evt.title, evt.image); // We just call the model's incrementing
+		    _model.submitPost(evt.value); // We just call the model's incrementing
 		    break;
 		default: // Unrecognized event or event not given
 		    console.log('Uncrecognized event:', evt.type); // Print what the bad value is
