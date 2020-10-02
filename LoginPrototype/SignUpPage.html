@@ -11,18 +11,17 @@
         <script type="text/javascript" src="authentication.js"></script>
     </head>
 
-    <body>
-        <h1> Authentication Demo </h1>
-        <form id="formContainer" method="post">
-            <input type="email" placeholder="email" id="email"/>
-            <input type="password" placeholder="password" id="password"/>
+    <a href="login_demo.html" onClick="">Go back</a>
 
-            <input type="button" onclick="signIn()" value="Sign In">
-            <input type="button"  onclick="signOut()" value="Sign Out"><br>
-            <input type="button"  onclick="signInGoogleAccount()" value="Sign In With Google">
+    <body>
+        <h1>Register</h1>
+        <form id="formContainer" method="post">
+            <input type="email" placeholder="Enter valid Email address" id="email"/><br>
+            <input type="password" placeholder="Password" id="password"/><br>
+
+            <input type="button"  onclick="signUpWithEmailAndPassword()" value="Sign Up">
         </form>
 
-        <a href="SignUpPage.html">sign up a new account</a>
 
     </body>
 

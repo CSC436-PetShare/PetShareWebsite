@@ -28,16 +28,33 @@ firebase.initializeApp(firebaseConfig);
 
 
 // Sign up with email & address
-function signUp(){
+function signUpWithEmailAndPassword(){
     var email = document.getElementById("email").value;
     var password = document.getElementById("password").value;
 
     // const promise = auth.createUserWithEmailAndPassword(email.value,password.value);
-    firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+    .then(function(){
+        verifyEmail();
+    })
+    .catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
         var errorMessage = error.message;
-        alert(errorMessage);
+        switch(error.code){
+            case "auth/email-already-in-use":
+                alert("Email Address already in use.");
+                break;
+            case "auth/invalid-email":
+                alert("Invalid email address");
+                break;
+            case "auth/operation-not-allowed":
+                alert("Registeration process escaped without finishing.");
+                break;
+            case "auth/weak-password":
+                alert("Password should be longer than 6");
+                break;
+        }
       });
 }
 
@@ -47,7 +64,11 @@ function signIn(){
     var password = document.getElementById("password").value;
 
     // const promise = auth.createUserWithEmailAndPassword(email.value,password.value);
-    const promise = firebase.auth().signInWithEmailAndPassword(email,password).catch(function(error) {
+    const promise = firebase.auth().signInWithEmailAndPassword(email,password)
+    .then(function(result){
+        returnLogInState();
+    })
+    .catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
         var errorMessage = error.message;
@@ -65,6 +86,7 @@ function signInGoogleAccount(){
         // The signed-in user info.
         var user = result.user;
         // ...
+        returnLogInState();
       }).catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
@@ -94,6 +116,7 @@ function signOut(){
 function returnCurrentUser(){
     var user = firebase.auth().currentUser;
     if(user){
+        // alert(user.email);
         return user;
     }else{
         alert("No user is signed in.");
@@ -110,8 +133,10 @@ function verifyEmail(){
         alert("Verification on '"+user.email+"' was successful");
         return;
     }
+    alert("Verification mail was sent! Please check your mailbox.");
     user.sendEmailVerification()
         .addOnCompleteListener((task)=>{
-            //Show the page where it says 
+            //Show the page where it says
+            alert("Verification on '"+user.email+"' was successful"); 
         });
 }
