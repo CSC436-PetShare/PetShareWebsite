@@ -80,7 +80,7 @@ var m_PostModel = function() {
 		    _observers.add(handler);
 		},
 
-		submitPost: function(image, title) {
+		submitPost: function(title, image) {
 			if(image != null && title != "") {
 				// Get a key for a new Post.
   		// 		var newPostKey = db.ref().child('posts').push().key;
@@ -121,27 +121,25 @@ var v_PostsView = function(model, controller, elmId) {
 		while (_elm.firstChild) {
 		    _elm.removeChild(_elm.firstChild);
 		}
-		var reader = new FileReader();
+
 		// update view
 		for(var i = 0; i < list.length; i++){
 			var post = document.createElement('div'); // Create new div
 			var title = document.createElement('p');
-			var image = document.createElement('img');
-			image.setAttribute('id', 'image' + i);
+			var img = document.createElement('img');
 			
-			post.setAttribute('class', 'post');
+			img.setAttribute('id', 'image' + i);
+			img.file = list[i][1];
 			title.innerHTML = list[i][0];
-			var loadFile = function(event) {
-    			image.src = URL.createObjectURL(event.target);
-    			image.onload = function() {
-      				URL.revokeObjectURL(image.src) // free memory
-    			}
-  			};
-  			loadFile(list[i][i]);
-    		
+			post.setAttribute('class', 'post');
+
 			post.append(title);
-			post.append(image);
+			post.append(img);
 		    _elm.append(post); // Add child to the parent element
+
+			var reader = new FileReader();
+			reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
+    		reader.readAsDataURL(img.file);
 		}
     }
 
@@ -168,6 +166,7 @@ var v_submitPostButton = function(model, btn, textfield, imageField){
 		    title: textfield.value,
 		    image: imageField.files[0]
 		})
+		console.log("File added");
 		textfield.value = "";
 		imageField.files[0] = null;
     });
@@ -229,7 +228,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
     var btn = document.getElementById("submitPostButton");
     var textField = document.getElementById("composePostField");
-    var imageField = document.getElementById("imageField");
+    var fileField = document.getElementById("fileField");
     var submitPostButton = v_submitPostButton(theModel, btn, textField, fileField);
 
     // Any view needs to register a function with the model that will cause
