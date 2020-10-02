@@ -24,7 +24,16 @@ firebase.initializeApp(firebaseConfig);
 //     }
 // })
 
-
+//Change 'home_url' to appropriate page later
+const home_url = 'Home.html';
+firebase.auth().onAuthStateChanged(function(user) {
+    if (user) {
+      // User is signed in.
+      window.location.href = home_url;
+    } else {
+      // No user is signed in.
+    }
+  });
 
 
 // Sign up with email & address
@@ -63,10 +72,11 @@ function signIn(){
     var email = document.getElementById("email").value;
     var password = document.getElementById("password").value;
 
-    // const promise = auth.createUserWithEmailAndPassword(email.value,password.value);
-    const promise = firebase.auth().signInWithEmailAndPassword(email,password)
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+
+    firebase.auth().signInWithEmailAndPassword(email,password)
     .then(function(result){
-        returnLogInState();
+        alert("Successfully logged in with "+email);
     })
     .catch(function(error) {
         // Handle Errors here.
@@ -86,7 +96,7 @@ function signInGoogleAccount(){
         // The signed-in user info.
         var user = result.user;
         // ...
-        returnLogInState();
+        alert("Successfully logged in with "+user);
       }).catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
