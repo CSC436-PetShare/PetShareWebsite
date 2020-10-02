@@ -1,3 +1,7 @@
+//@Author: Eujin Ko
+//  Handles authentication process using Firebase
+
+
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 var firebaseConfig = {
@@ -10,13 +14,18 @@ var firebaseConfig = {
     appId: "1:540433055144:web:3713dce31512f4ad21b19d",
     measurementId: "G-1T4DYTXNQP"
 };
+
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+// Add analytics if supported
 // firebase.analytics.isSupported().then((isSupported)=>{
 //     if(isSupported){
 //         firebase.analytics();
 //     }
 // })
+
+
+
 
 // Sign up with email & address
 function signUp(){
@@ -65,7 +74,7 @@ function signInGoogleAccount(){
         // The firebase.auth.AuthCredential type that was used.
         var credential = error.credential;
         // ...
-        alert(errorCode.name);
+        alert(errorCode);
       });
 
 }
@@ -85,7 +94,6 @@ function signOut(){
 function returnCurrentUser(){
     var user = firebase.auth().currentUser;
     if(user){
-        alert(user);
         return user;
     }else{
         alert("No user is signed in.");
@@ -98,12 +106,12 @@ function returnCurrentUser(){
 // *This function should be called after Sign up for new account
 function verifyEmail(){
     var user = returnCurrentUser();
+    if(user.emailVerified){
+        alert("Verification on '"+user.email+"' was successful");
+        return;
+    }
     user.sendEmailVerification()
         .addOnCompleteListener((task)=>{
-            if(task.isSuccessful()){
-                alert(user.name+" verified");
-            }else{
-                console.log('Verification failed');
-            }
+            //Show the page where it says 
         });
 }

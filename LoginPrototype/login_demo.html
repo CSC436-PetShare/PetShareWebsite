@@ -13,17 +13,17 @@
 
     <body>
         <h1> Form </h1>
-        <div id="formContainer">
+        <form id="formContainer" method="post">
             <input type="email" placeholder="email" id="email"/>
             <input type="password" placeholder="password" id="password"/>
 
-            <button onclick="signIn()">Sign In</button>
-            <button onclick="returnCurrentUser()">current User</button>
-            <button onclick="signOut()" >Sign Out</button>
-            <button onclick="signUp()">Sign Up</button>
-            <button onclick="verifyEmail()">verifyEmail</button>
-            <button onclick="signInGoogleAccount()">Sign In With Google</button>
-        </div>
+            <input type="button" onclick="signIn()" value="Sign In">
+            <input type="button"  onclick="returnCurrentUser()" value="current User">
+            <input type="button"  onclick="signOut()" value="Sign Out">
+            <input type="button"  onclick="signUp()" value="Sign Up">
+            <input type="button"  onclick="verifyEmail()" value="verifyEmail">
+            <input type="button"  onclick="signInGoogleAccount()" value="Sign In With Google">
+        </form>
 
     </body>
 
