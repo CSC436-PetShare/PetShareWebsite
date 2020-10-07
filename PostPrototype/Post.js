@@ -58,6 +58,10 @@ var m_FeedModel = function() {
 			_observers.notify();
 		},
 
+		getPost: function(id) {
+			return _postList[id];
+		},
+
 		getPostList: function() {
 			return _postList;
 		}
@@ -69,7 +73,7 @@ var m_Post = function() {
     var _postText = ""; // post text
     var _likeStatus = false; // false: neutral, true: like
 
-    var _commentList = [];
+    var _commentList = ["whats up man", "how is it going"]; // list of strings
 
     return {
 		// This member of the object, register, is a function that allows
@@ -90,6 +94,17 @@ var m_Post = function() {
 			_likeStatus = status;
 		},
 
+		composeComment: function(text) {
+			if(text != ""){
+				_commentList.push(text);
+			}
+			_observers.notify();
+		},
+
+		getCommentList: function() {
+			return _commentList;
+		},
+
 		getLikeStatus: function() {
 			return _likeStatus;
 		},
@@ -101,7 +116,7 @@ var m_Post = function() {
 }
 
 var v_FeedView = function(model, elmId) {
-    var _model = model; // internal handle to the model, though we could use the parameter as well
+	var _model = model;
     var _elm = document.getElementById(elmId); // get the DOM node associated with the element
 
     var _render = function(list) {
@@ -111,26 +126,28 @@ var v_FeedView = function(model, elmId) {
 	    	_elm.removeChild(_elm.firstChild);
 		}	
 
-		console.log(list.length);
 		// update view
 		for(var i = 0; i < list.length; i++){
 
+			var id = "post" + i;
 			// Create elements
 			var post = document.createElement('div');
-			var text = document.createElement('p');
-			var comments = document.createElement('div');
-			var likeStatus = document.createElement('label');
-
-			// Set elements
 			post.setAttribute('class', 'post');
+			post.setAttribute('id', id);
+			var text = document.createElement('p');
+			var likeStatus = document.createElement('label');
+			var comments = v_createComments(_model.getPost(i).getCommentList());;
+			
+			// Set elements
 			text.innerHTML = list[i].getPostText();
 			likeStatus.innerHTML = list[i].getLikeStatus();
+			
 
 			// Arrange elements
 			post.append(text);
 			post.append(likeStatus);
-			post.append(comments); // Work in progress
-		    _elm.append(post); // Add child to the parent element
+			post.append(comments);
+			_elm.append(post);
 		}
     }
 
@@ -141,6 +158,19 @@ var v_FeedView = function(model, elmId) {
 		    _render(_model.getPostList());
 		}
     }
+}
+
+var v_createComments = function(comments) {
+	var elm = document.createElement('div');
+	for(var i = 0; i < comments.length; i++){
+		var commentElm = document.createElement('div');
+		var text = document.createElement('p');
+		commentElm.setAttribute('class', 'comment');
+		text.innerHTML = comments[i];
+		commentElm.append(text);
+		elm.append(commentElm);
+	}
+	return elm;
 }
 
 var v_submitPostButton = function(model, btn, textfield){
