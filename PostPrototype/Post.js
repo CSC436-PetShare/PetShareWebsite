@@ -1,5 +1,9 @@
 /*
 	Usage: This javascript is used with Post.html to create a MVC structure
+	Naming: m_ before a name means it is for the model
+			v_ before a name means it is for the view
+			c_ before a name means it is for the controller
+			_ before a name means it is a private field to the object
 */
 var globals = {
     signals: {
@@ -30,9 +34,9 @@ var makeSignaller = function() {
 }
 
 
-var m_PostModel = function() {
+var m_FeedModel = function() {
     var _observers = makeSignaller();  // To notify observers
-    var _postList = [];
+    var _postList = []; // list of m_Post objects
 
     return {
 		// This member of the object, register, is a function that allows
@@ -45,16 +49,12 @@ var m_PostModel = function() {
 		    _observers.add(handler);
 		},
 
-		submitPost: function(post) {
-			if(post != ""){
+		composePost: function(text) {
+			var post = m_Post();
+			post.setPostText(text);
+			if(post.getPostText() != ""){
 				_postList.push(post);
 			}
-			_observers.notify();
-		},
-
-		deletePost: function(index) {
-			console.log("deleted post " + _postList[index]);
-			_postList.splice(index, 1);
 			_observers.notify();
 		},
 
@@ -64,25 +64,72 @@ var m_PostModel = function() {
     }
 }
 
-var v_PostsView = function(model, controller, elmId) {
+var m_Post = function() {
+    var _observers = makeSignaller();  // To notify observers
+    var _postText = ""; // post text
+    var _likeStatus = false; // false: neutral, true: like
+
+    var _commentList = [];
+
+    return {
+		// This member of the object, register, is a function that allows
+		// observers to register/follow us.
+		// handler: the function of the observer that should be called when we
+		// update
+		register: function(handler) {
+		    // We add observers to our signaller with the signaller's add
+		    // function
+		    _observers.add(handler);
+		},
+
+		setPostText: function(text) {
+			_postText = text;
+		},
+
+		setLikeStatus: function(status) {
+			_likeStatus = status;
+		},
+
+		getLikeStatus: function() {
+			return _likeStatus;
+		},
+
+		getPostText: function() {
+			return _postText;
+		}
+    }
+}
+
+var v_FeedView = function(model, elmId) {
     var _model = model; // internal handle to the model, though we could use the parameter as well
     var _elm = document.getElementById(elmId); // get the DOM node associated with the element
-    var _controller = controller;
 
     var _render = function(list) {
 
 		// clear before updating view
 		while (_elm.firstChild) {
-		    _elm.removeChild(_elm.firstChild);
-		}
+	    	_elm.removeChild(_elm.firstChild);
+		}	
 
+		console.log(list.length);
 		// update view
 		for(var i = 0; i < list.length; i++){
-			var post = document.createElement('div'); // Create new div
+
+			// Create elements
+			var post = document.createElement('div');
 			var text = document.createElement('p');
+			var comments = document.createElement('div');
+			var likeStatus = document.createElement('label');
+
+			// Set elements
 			post.setAttribute('class', 'post');
-			text.innerHTML = list[i];
+			text.innerHTML = list[i].getPostText();
+			likeStatus.innerHTML = list[i].getLikeStatus();
+
+			// Arrange elements
 			post.append(text);
+			post.append(likeStatus);
+			post.append(comments); // Work in progress
 		    _elm.append(post); // Add child to the parent element
 		}
     }
@@ -146,7 +193,7 @@ var c_Controller = function(model) {
 	dispatch: function(evt) {
 	    switch(evt.type) { // We will do something different depending on the event type
 		case (globals.signals.post): // This is what we do for an increment event
-		    _model.submitPost(evt.value); // We just call the model's incrementing
+		    _model.composePost(evt.value); // We just call the model's incrementing
 		    break;
 		default: // Unrecognized event or event not given
 		    console.log('Uncrecognized event:', evt.type); // Print what the bad value is
@@ -161,14 +208,14 @@ var c_Controller = function(model) {
 // loaded so I will be sure all the HTML content exists
 // Here is where we will create the object and wire them
 window.addEventListener('DOMContentLoaded', function() {
-    var theModel = m_PostModel(); // We have one model
+    var theModel = m_FeedModel(); // We have one model
     var theController = c_Controller(theModel);
 
     // We create views (and controls). We can have many of them. We could also
     // quickly make duplicates. For example, you could add another div element to
     // your HTML and put another fancy view there OR you could make another
     // button in your HTML and have multiple increment buttons -- Try it!
-    var postView = v_PostsView(theModel, theController, 'postsView');
+    var postView = v_FeedView(theModel, 'FeedView');
 
     var btn = document.getElementById("submitPostButton");
     var textField = document.getElementById("composePostField");
