@@ -10,6 +10,3 @@ const access_token = {
     "expires_in": 3600,
     "access_token": "..."
 }
-
-var request = new XMLHttpRequest("GET","Authorization: Bearer {access_token}");
-console.log(request.responseURL);
