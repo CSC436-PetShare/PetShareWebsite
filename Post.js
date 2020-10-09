@@ -16,6 +16,7 @@ var config = {
 
 firebase.initializeApp(config);
 
+
 var db = firebase.database();
 //Points to the root reference
 var storage = firebase.storage();
@@ -59,30 +60,31 @@ var m_PostModel =  function() {
 		    _observers.add(handler);
 		},
 
-		submitPost: function(title, image) {
+		submitPost: async function(title, image) {
 			if(image != null && title != "") {
 				//upload file
-				storage.ref("images/" + image.name).put(image);
+				//TODO: remove spaces from image name
+				await storage.ref("images/" + image.name).put(image);
 				// Get a key for a new Post.
   				var newPostKey = db.ref().child('posts').push().key;
-				db.ref('posts/' + newPostKey).set({
+				await db.ref('posts/' + newPostKey).set({
 					comments: "",
 					image: image.name,
 					title: title,
 					upvotes: 0,
 					user: ""
 				});
-				var _childData = [title, image.name, "", 0, ""];
-				_postList.push(_childData);
 			
 			}
 			_observers.notify();
 		},
 
-		getData: function() {
+		getData: async function() {
 			//Read all the posts from the database
+			//return new Promise(async (resolve, reject) => {
+			var newList = []
     		var query = db.ref('posts');
-    		query.once("value").then(function(snapshot) {
+    		await query.once("value").then(function(snapshot) {
     			snapshot.forEach(function(childSnapshot) {
       			// key will be the unique key for each post
       			var key = childSnapshot.key;
@@ -101,10 +103,9 @@ var m_PostModel =  function() {
       			childData.push(childSnapshot.child("upvotes").val());
       			childData.push(childSnapshot.child("user").val());
 
-      			_postList.push(childData);
-      			console.log(_postList.length);
+      			newList.push(childData);
   				});
-			});
+			}).then(() => {_postList = newList});
 		},
 
 		deletePost: function(index) {
@@ -113,8 +114,10 @@ var m_PostModel =  function() {
 			_observers.notify();
 		},
 
-		getPostList: function() {
+		getPostList: async function() {
+			await this.getData();
 			return _postList;
+			
 		}
     }
 }
@@ -124,29 +127,9 @@ var v_PostsView = function(model, controller, elmId) {
     var _elm = document.getElementById(elmId); // get the DOM node associated with the element
     var _controller = controller;
 
-    var _render = async function(list) {
-		// clear before updating view
-		while (_elm.firstChild) {
-		    _elm.removeChild(_elm.firstChild);
-		}
-		// update view
-		for(var i = 0; i < list.length; i++){
-			console.log("Loop");
-			var post = document.createElement('div'); // Create new div
-			var title = document.createElement('p');
-			var img = document.createElement('img');
-			img.setAttribute('id', 'image' + i);
-			
-			await storage.ref("images/" + list[i][0]).getDownloadURL().then(function(url) {
-				console.log();
-				var xhr = new XMLHttpRequest();
-    			xhr.responseType = 'blob';
-    			xhr.onload = function(event) {
-    				var blob = xhr.response;
-    			};
-    			xhr.open('GET', url);
-    			xhr.send();
-       			img.src = url;
+    var _getReference = async function (elm, imageName){
+    	await storage.ref("images/" + imageName).getDownloadURL().then(function(url) {
+       			elm.src = url;
 			}).catch(function(error) {
 			  switch (error.code) {
 			    case 'storage/object-not-found':
@@ -165,6 +148,20 @@ var v_PostsView = function(model, controller, elmId) {
 			      break;
 			  }
 			});
+    }
+
+    var _render = function(list) {
+		// clear before updating view
+		while (_elm.firstChild) {
+		    _elm.removeChild(_elm.firstChild);
+		}
+		// update view
+		for(var i = 0; i < list.length; i++){
+			var post = document.createElement('div'); // Create new div
+			var title = document.createElement('p');
+			var img = document.createElement('img');
+			img.setAttribute('id', 'image' + i);
+			_getReference(img, list[i][1]);
 			
 			img.setAttribute('id', 'image' + i);
 			title.innerHTML = list[i][0];
@@ -180,8 +177,9 @@ var v_PostsView = function(model, controller, elmId) {
     return {
 		// Public version of the render function. We need to access it to
 		// register it with the model
-		render: function() {
-		    _render(_model.getPostList());
+		render:async function() {
+			var list = await _model.getPostList();
+		    _render(list);
 		}
     }
 }

@@ -11,6 +11,7 @@ var config = {
 
 firebase.initializeApp(config);
 
+
 //Change 'home_url' to appropriate page later
 const home_url = 'Home.html';
 firebase.auth().onAuthStateChanged(function(user) {
