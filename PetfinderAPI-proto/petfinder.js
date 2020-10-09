@@ -1,12 +1,14 @@
 const petFinderKey = "S2t3nrRa8vSmzQDxActpsXAhglEQdF5rvVQWfLBKQlT3ByXXia";
 const petFinderSecret = "dyFrO08uwicmha6hFDziKndaMhjgk4Wk1joLrYgd";
 
-const token_url = '<https://api.petfinder.com/v2/oauth2/token>';
-const token_body = 'grant_type=client_credentials&client_id={petFinderKey}&client_secret={petFinderSecret}';
+var petfinder = require("@petfinder/petfinder-js");
+var client = new petfinder.Client({apiKey: petFinderKey, secret: petFinderSecret});
 
-const access_token = {
-    "access_token": token_body,
-    "token_type": "Bearer",
-    "expires_in": 3600,
-    "access_token": "..."
-}
+client.animal.search()
+    .then(function (response) {
+        // Do something with `response.data.animals`
+        console.log(response.data);
+    })
+    .catch(function (error) {
+        // Handle the error
+    });
