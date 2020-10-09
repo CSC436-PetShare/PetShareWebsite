@@ -7,6 +7,20 @@ var globals = {
     }
 }
 
+var config = {
+    apiKey: "AIzaSyBq4vLcktzEWiKuyvAnDfSW6KivKVg6gag",
+    authDomain: "petshare-92cfa.firebaseapp.com",
+    databaseURL: "https://petshare-92cfa.firebaseio.com/",
+    storageBucket: "gs://petshare-92cfa.appspot.com/"
+};
+
+firebase.initializeApp(config);
+
+var db = firebase.database();
+//Points to the root reference
+var storage = firebase.storage();
+
+
 /*
 object acting function: makeSignaller
 param: none
@@ -30,45 +44,10 @@ var makeSignaller = function() {
 }
 
 
-var m_PostModel = function() {
-	// Set the configuration for your app
-  	// TODO: Replace with your project's config object
- //  	var config = {
- //    	apiKey: "apiKey",
- //    	authDomain: "projectId.firebaseapp.com",
- //    	databaseURL: "https://petshare-92cfa.firebaseio.com/",
- //    	storageBucket: "gs://petshare-92cfa.appspot.com/"
- //  	};
- //  	firebase.initializeApp(config);
-	// var db = firebase.database();
-
+var m_PostModel =  function() {
     var _observers = makeSignaller();  // To notify observers
  	var _postList = [];
-
- 	//Read all the posts from the database
-  //   var query = db.ref('posts');
-  //   list.once("value").then(function(snapshot) {
-  //   		snapshot.forEach(function(childSnapshot) {
-  //     		// key will be the unique key for each post
-  //     		var key = childSnapshot.key;
-  //     		 array containing child data
-  //     		*index 0 = title
-  //     		*index 1 = image
-  //     		*index 2 = comments
-  //     		*index 3 = upvotes
-  //     		*index 4 = user
-      		
-  //     		var childData = []
-  //     		childData.push(childSnapshot.child("title").val());
-  //     		childData.push(childSnapshot.child("image").val());
-  //     		childData.push(childSnapshot.child("comments").val());
-  //     		childData.push(childSnapshot.child("upvotes").val());
-  //     		childData.push(childSnapshot.child("user").val());
-
-  //     		_postList.push(childData);
-  // 			});
-		// });
-
+ 	
     return {
 		// This member of the object, register, is a function that allows
 		// observers to register/follow us.
@@ -82,20 +61,50 @@ var m_PostModel = function() {
 
 		submitPost: function(title, image) {
 			if(image != null && title != "") {
+				//upload file
+				storage.ref("images/" + image.name).put(image);
 				// Get a key for a new Post.
-  		// 		var newPostKey = db.ref().child('posts').push().key;
-				// db.ref('posts/' + newPostKey).set({
-				// 	comments: "",
-				// 	image: image,
-				// 	title: title,
-				// 	upvotes: 0,
-				// 	user: ""
-				// });
-				var _childData = [title, image, "", 0, ""];
+  				var newPostKey = db.ref().child('posts').push().key;
+				db.ref('posts/' + newPostKey).set({
+					comments: "",
+					image: image.name,
+					title: title,
+					upvotes: 0,
+					user: ""
+				});
+				var _childData = [title, image.name, "", 0, ""];
 				_postList.push(_childData);
 			
 			}
 			_observers.notify();
+		},
+
+		getData: function() {
+			//Read all the posts from the database
+    		var query = db.ref('posts');
+    		query.once("value").then(function(snapshot) {
+    			snapshot.forEach(function(childSnapshot) {
+      			// key will be the unique key for each post
+      			var key = childSnapshot.key;
+      			/*array containing child data
+      			index 0 = title
+      			index 1 = image name
+      			index 2 = comments
+      			index 3 = upvotes
+      			index 4 = user*/
+      		
+      		
+      			var childData = []
+      			childData.push(childSnapshot.child("title").val());
+      			childData.push(childSnapshot.child("image").val());
+      			childData.push(childSnapshot.child("comments").val());
+      			childData.push(childSnapshot.child("upvotes").val());
+      			childData.push(childSnapshot.child("user").val());
+
+      			_postList.push(childData);
+      			console.log(_postList.length);
+  				});
+			});
 		},
 
 		deletePost: function(index) {
@@ -115,31 +124,56 @@ var v_PostsView = function(model, controller, elmId) {
     var _elm = document.getElementById(elmId); // get the DOM node associated with the element
     var _controller = controller;
 
-    var _render = function(list) {
-
+    var _render = async function(list) {
 		// clear before updating view
 		while (_elm.firstChild) {
 		    _elm.removeChild(_elm.firstChild);
 		}
-
 		// update view
 		for(var i = 0; i < list.length; i++){
+			console.log("Loop");
 			var post = document.createElement('div'); // Create new div
 			var title = document.createElement('p');
 			var img = document.createElement('img');
+			img.setAttribute('id', 'image' + i);
+			
+			await storage.ref("images/" + list[i][0]).getDownloadURL().then(function(url) {
+				console.log();
+				var xhr = new XMLHttpRequest();
+    			xhr.responseType = 'blob';
+    			xhr.onload = function(event) {
+    				var blob = xhr.response;
+    			};
+    			xhr.open('GET', url);
+    			xhr.send();
+       			img.src = url;
+			}).catch(function(error) {
+			  switch (error.code) {
+			    case 'storage/object-not-found':
+			      // File doesn't exist
+			      break;
+
+			    case 'storage/unauthorized':
+			      // User doesn't have permission to access the object
+			      break;
+
+			    case 'storage/canceled':
+			      // User canceled the upload
+			      break;
+			    case 'storage/unknown':
+			      // Unknown error occurred, inspect the server response
+			      break;
+			  }
+			});
 			
 			img.setAttribute('id', 'image' + i);
-			img.file = list[i][1];
 			title.innerHTML = list[i][0];
 			post.setAttribute('class', 'post');
 
+			
 			post.append(title);
 			post.append(img);
 		    _elm.append(post); // Add child to the parent element
-
-			var reader = new FileReader();
-			reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
-    		reader.readAsDataURL(img.file);
 		}
     }
 
@@ -166,7 +200,6 @@ var v_submitPostButton = function(model, btn, textfield, imageField){
 		    title: textfield.value,
 		    image: imageField.files[0]
 		})
-		console.log("File added");
 		textfield.value = "";
 		imageField.files[0] = null;
     });
@@ -245,4 +278,5 @@ window.addEventListener('DOMContentLoaded', function() {
     // once to display their default behavior
     postView.render();
     submitPostButton.render();
+
 });
