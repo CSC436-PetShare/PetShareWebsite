@@ -4,16 +4,16 @@
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-var firebaseConfig = {
-    apiKey: "AIzaSyB9G954YMLb1cdGKsq1PqsDwOqXvHa8zJg",
-    authDomain: "fir-web-2fce3.firebaseapp.com",
-    databaseURL: "https://fir-web-2fce3.firebaseio.com",
-    projectId: "fir-web-2fce3",
-    storageBucket: "fir-web-2fce3.appspot.com",
-    messagingSenderId: "540433055144",
-    appId: "1:540433055144:web:3713dce31512f4ad21b19d",
-    measurementId: "G-1T4DYTXNQP"
-};
+const firebaseConfig = {
+    apiKey: "AIzaSyBq4vLcktzEWiKuyvAnDfSW6KivKVg6gag",
+    authDomain: "petshare-92cfa.firebaseapp.com",
+    databaseURL: "https://petshare-92cfa.firebaseio.com",
+    projectId: "petshare-92cfa",
+    storageBucket: "petshare-92cfa.appspot.com",
+    messagingSenderId: "596084775991",
+    appId: "1:596084775991:web:496ca284a0c043476f73b2",
+    measurementId: "G-VSQYLD75KR"
+  };
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
