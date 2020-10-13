@@ -2,9 +2,8 @@ const petFinderKey = "S2t3nrRa8vSmzQDxActpsXAhglEQdF5rvVQWfLBKQlT3ByXXia";
 const petFinderSecret = "dyFrO08uwicmha6hFDziKndaMhjgk4Wk1joLrYgd";
 
 var pet_spec = {
-    type: "",
-    breed: "",
-    limit: 50,
+    limit: 5,
+    //MAX LIMIT: 50
 }
 
 var petfinder = require("@petfinder/petfinder-js");
@@ -17,21 +16,26 @@ var petfinder = require("@petfinder/petfinder-js");
 var settings = function (spec, value) {
     pet_spec[spec] = value;
 }
-settings("type", "Dog");
-console.log(pet_spec);
-var client = new petfinder.Client({ apiKey: petFinderKey, secret: petFinderSecret });;
 
 var find_pet = function () {
-    client.animal.search({
+    var client = new petfinder.Client({
+        apiKey: petFinderKey,
+        secret: petFinderSecret 
+    });;
 
-        type: "Dog",
-    })
-        .then(function (response) {
-            // Do something with `response.data.animals`
-            console.log(response.data);
-        })
-        .catch(function (error) {
-            // Handle the error
-        });
+    client.animal.search(pet_spec)
+    .then(function (response) {
+        // Do something with `response.data.animals`
+        console.log(response.data);
+        return response.data;
+    }).catch(function (error) {
+        // Handle the error
+        return null;
+    });
 }
-find_pet();
+
+
+// settings("type", "Dog");
+// settings("coat", "Long");
+// settings("size","Extra Large");
+// find_pet();
