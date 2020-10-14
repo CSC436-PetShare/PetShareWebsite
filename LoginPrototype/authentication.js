@@ -2,6 +2,9 @@
 //  Handles authentication process using Firebase
 
 
+
+/*********Alerts are presetted for testing purpose. Delete later for convenience*******/
+
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -29,7 +32,12 @@ const home_url = 'Home.html';
 firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
       // User is signed in.
-      window.location.href = home_url;
+      if(checksIfVerified()){
+        window.location.href = home_url;
+      }else{
+          alert("User hasn't been verified, please check your mail box!");
+          signOut();
+      }
     } else {
       // No user is signed in.
     }
@@ -77,12 +85,7 @@ function signIn(){
 
     firebase.auth().signInWithEmailAndPassword(email,password)
     .then(function(result){
-        if(checksIfVerified()){
-            alert("Successfully logged in with "+email);
-        }else{
-            alert("User hasn't been verified yet, please check you mail box!");
-            signOut();
-        }
+        alert("Successfully logged in with "+email);
     })
     .catch(function(error) {
         // Handle Errors here.
