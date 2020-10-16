@@ -1,26 +1,18 @@
 /*
-	Usage: This javascript is used with Post.html to create a MVC structure
+	Usage: This javascript is used with home.html to create a MVC structure
 */
 var globals = {
     signals: {
-	post: 'POST'
+	post: 'POST',
+	comment: 'COMMENT'
     }
 }
 
-var config = {
-    apiKey: "AIzaSyBq4vLcktzEWiKuyvAnDfSW6KivKVg6gag",
-    authDomain: "petshare-92cfa.firebaseapp.com",
-    databaseURL: "https://petshare-92cfa.firebaseio.com/",
-    storageBucket: "gs://petshare-92cfa.appspot.com/"
-};
+import {fb} from './firebaseInit.js'
 
-firebase.initializeApp(config);
-
-
-var db = firebase.database();
-//Points to the root reference
-var storage = firebase.storage();
-
+var db = fb.database();
+var storage = fb.storage();
+var auth = fb.auth();
 
 /*
 object acting function: makeSignaller
@@ -68,11 +60,11 @@ var m_PostModel =  function() {
 				// Get a key for a new Post.
   				var newPostKey = db.ref().child('posts').push().key;
 				await db.ref('posts/' + newPostKey).set({
-					comments: "",
+					comments: ['Lol so cute', 'same'],
 					image: image.name,
 					title: title,
 					upvotes: 0,
-					user: ""
+					user: auth.currentUser.uid
 				});
 			
 			}
@@ -88,12 +80,15 @@ var m_PostModel =  function() {
     			snapshot.forEach(function(childSnapshot) {
       			// key will be the unique key for each post
       			var key = childSnapshot.key;
-      			/*array containing child data
+      			/*
+      			array containing child data
       			index 0 = title
       			index 1 = image name
       			index 2 = comments
       			index 3 = upvotes
-      			index 4 = user*/
+      			index 4 = user
+      			index 5 = post
+      			*/
       		
       		
       			var childData = []
@@ -102,10 +97,22 @@ var m_PostModel =  function() {
       			childData.push(childSnapshot.child("comments").val());
       			childData.push(childSnapshot.child("upvotes").val());
       			childData.push(childSnapshot.child("user").val());
+      			childData.push(key);
 
       			newList.push(childData);
   				});
 			}).then(() => {_postList = newList});
+		},
+
+		submitComment: async function(post, text, commentList) {
+			console.log(post);
+			console.log(text);
+			console.log(commentList);
+			commentList.push(text);
+			db.ref("posts/" + post).update({
+				comments: commentList
+			});
+			_observers.notify();
 		},
 
 		deletePost: function(index) {
@@ -126,6 +133,7 @@ var v_PostsView = function(model, controller, elmId) {
     var _model = model; // internal handle to the model, though we could use the parameter as well
     var _elm = document.getElementById(elmId); // get the DOM node associated with the element
     var _controller = controller;
+    var _observers = makeSignaller();
 
     var _getReference = async function (elm, imageName){
     	await storage.ref("images/" + imageName).getDownloadURL().then(function(url) {
@@ -158,18 +166,51 @@ var v_PostsView = function(model, controller, elmId) {
 		// update view
 		for(var i = 0; i < list.length; i++){
 			var post = document.createElement('div'); // Create new div
+			var user = document.createElement('p');
 			var title = document.createElement('p');
 			var img = document.createElement('img');
-			img.setAttribute('id', 'image' + i);
-			_getReference(img, list[i][1]);
-			
-			img.setAttribute('id', 'image' + i);
+			var commentsLabel = document.createElement('label');
+			var newComment = document.createElement('div');
+			var commentBox = document.createElement('input');
+			var submitComment = document.createElement('input');
+
+			//Set commentsLabel
+			commentsLabel.innerHTML = "Comments:";
+			//Set User
+			user.innerHTML = list[i][4];
+			//Set title
 			title.innerHTML = list[i][0];
+			//Set image
+			img.setAttribute('id', 'image' + i);
+			_getReference(img, list[i][1]);		
+			//Create comments
+			var comments = v_createComments(list[i][2]);
+			//Set up newComment div
+			commentBox.type = "text";
+			submitComment.type = "button";
+			submitComment.value = "Submit Comment";
+			var commentList = list[i][2];
+			var currentPost = list[i][5];
+			submitComment.addEventListener('click', function() {
+				_observers.notify({
+		   			type: globals.signals.comment,
+		    		text: auth.currentUser.uid + ": " + commentBox.value,
+		    		comments: commentList,
+		    		post: currentPost
+				})
+				commentBox.value = "";
+    		});
+			newComment.append(commentBox);
+			newComment.append(submitComment);
+
 			post.setAttribute('class', 'post');
 
-			
+			post.append(user);
 			post.append(title);
 			post.append(img);
+			post.append(commentsLabel);
+			post.append(newComment);
+			post.append(comments);
 		    _elm.append(post); // Add child to the parent element
 		}
     }
@@ -180,6 +221,9 @@ var v_PostsView = function(model, controller, elmId) {
 		render:async function() {
 			var list = await _model.getPostList();
 		    _render(list);
+		},
+		register: function(handler) {
+		    _observers.add(handler);
 		}
     }
 }
@@ -199,7 +243,7 @@ var v_submitPostButton = function(model, btn, textfield, imageField){
 		    image: imageField.files[0]
 		})
 		textfield.value = "";
-		imageField.files[0] = null;
+		imageField.value = "";
     });
 
     return {
@@ -215,6 +259,18 @@ var v_submitPostButton = function(model, btn, textfield, imageField){
     }
 }
 
+var v_createComments = function(comments) {
+	var elm = document.createElement('div');
+	for(var i = 0; i < comments.length; i++){
+		var commentElm = document.createElement('div');
+		var text = document.createElement('p');
+		commentElm.setAttribute('class', 'comment');
+		text.innerHTML = comments[i];
+		commentElm.append(text);
+		elm.append(commentElm);
+	}
+	return elm;
+}
 
 /*
 object acting function: c_Controller
@@ -235,8 +291,11 @@ var c_Controller = function(model) {
     return {
 	dispatch: function(evt) {
 	    switch(evt.type) { // We will do something different depending on the event type
-		case (globals.signals.post): // This is what we do for an increment event
-		    _model.submitPost(evt.title, evt.image); // We just call the model's incrementing
+		case (globals.signals.post): 
+		    _model.submitPost(evt.title, evt.image); 
+		    break;
+		case (globals.signals.comment):
+		    _model.submitComment(evt.post, evt.text, evt.comments);
 		    break;
 		default: // Unrecognized event or event not given
 		    console.log('Uncrecognized event:', evt.type); // Print what the bad value is
@@ -271,6 +330,7 @@ window.addEventListener('DOMContentLoaded', function() {
     // register wtih it
     // <varname>.register(myController.dispatch)
     submitPostButton.register(theController.dispatch);
+    postView.register(theController.dispatch);
 
     // The views won't render until an update occurs, so we need to call them
     // once to display their default behavior
