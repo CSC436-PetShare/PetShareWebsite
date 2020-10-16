@@ -1,0 +1,80 @@
+@font-face {
+    font-family: Roboto;
+    src: url(Format/Roboto);
+}
+
+
+body {
+    margin: 0px;
+    background: transparent;
+}
+
+img {
+    width: 130px;
+    height: 100px;
+    background-color: transparent;
+}
+
+#header {
+    background-color: #AADBFF;
+    width: auto;
+    height: 100px;
+    border: 3px solid #64A9DB;
+}
+
+#title {
+    position: absolute;
+    font-family: Roboto-Thin;
+    font-size: 90pt;
+    left: 150px;
+    top: -95px;
+    color: white;
+    -webkit-text-stroke: 1px black;
+}
+
+.navigation {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    width: auto;
+    height: 35px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+#profile {
+    float: right;
+}
+
+#settings {
+    float: right;
+}
+
+.navigation li {
+    float: left;
+    
+}
+
+.navigation li a {
+    display: block;
+    text-align: center;
+    padding: 9px 13px;
+    color: black;
+    text-decoration: none;
+    border-right: solid 1px #C4C4C4;
+}
+
+.navigation li a:hover:not(.active) {
+    background-color: #C4C4C4;
+}
+
+.active {
+    background-color: #64A9DB;
+}
+
+.post {
+    border: 2px solid #ccc;
+    margin: 5px;
+    width: 250px;
+    word-wrap: break-word;
+}
