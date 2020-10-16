@@ -33,9 +33,34 @@ var find_pet = function () {
         return null;
     });
 }
+//Returns information about the type
+var fillViewWithPetType = function(){
+    var client = new petfinder.Client({
+        apiKey: petFinderKey,
+        secret: petFinderSecret 
+    });;
 
+    client.animalData.types().then(
+        response => {
+            var types = response.data.types;
+
+            // var html_select = document.createElement("SELECT");
+            // html_select.setAttribute("id","typeSelect");
+            // view.appendChild(html_select);
+            // view.appendChild(html_input);
+            for(i in types){
+                // var option = document.createElement("option");
+                // option.setAttribute("value", types[i].name);
+                // html_select.appendChild(option);
+                console.log( types[i].name);
+            }
+            // console.log(html_select.innerText);
+        }
+    )
+
+}
 
 // settings("type", "Dog");
 // settings("coat", "Long");
 // settings("size","Extra Large");
-// find_pet();
+fillViewWithPetType();
