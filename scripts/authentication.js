@@ -1,24 +1,35 @@
 //@Author: Eujin Ko
 //  Handles authentication process using Firebase
 
-// Set the configuration for your app
-var config = {
-    apiKey: "AIzaSyBq4vLcktzEWiKuyvAnDfSW6KivKVg6gag",
-    authDomain: "petshare-92cfa.firebaseapp.com",
-    databaseURL: "https://petshare-92cfa.firebaseio.com/",
-    storageBucket: "gs://petshare-92cfa.appspot.com/"
-};
 
-firebase.initializeApp(config);
 
+/*********Alerts are presetted for testing purpose. Delete later for convenience*******/
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+import {fb} from './firebaseInit.js'
+
+
+var auth = fb.auth();
+
+// Add analytics if supported
+// firebase.analytics.isSupported().then((isSupported)=>{
+//     if(isSupported){
+//         firebase.analytics();
+//     }
+// })
 
 //Change 'home_url' to appropriate page later
-const home_url = 'Home.html';
-firebase.auth().onAuthStateChanged(function(user) {
+const home_url = 'home.html';
+auth.onAuthStateChanged(function(user) {
     if (user) {
       // User is signed in.
-      window.location.href = home_url;
-      console.log("Log in successful");
+      if(!checksIfVerified()){
+        window.location.href = home_url;
+      }else{
+          alert("User hasn't been verified, please check your mail box!");
+          signOut();
+      }
     } else {
       // No user is signed in.
     }
@@ -31,9 +42,10 @@ function signUpWithEmailAndPassword(){
     var password = document.getElementById("password").value;
 
     // const promise = auth.createUserWithEmailAndPassword(email.value,password.value);
-    firebase.auth().createUserWithEmailAndPassword(email, password)
+    auth.createUserWithEmailAndPassword(email, password)
     .then(function(){
-        verifyEmail();
+        sendVerifyEmail();
+        signOut();
     })
     .catch(function(error) {
         // Handle Errors here.
@@ -56,14 +68,14 @@ function signUpWithEmailAndPassword(){
       });
 }
 
-// Sign in with email & address
+// Sign in with email & address if the user has verified with the actual email address
 function signIn(){
     var email = document.getElementById("email").value;
     var password = document.getElementById("password").value;
 
-    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+    auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
-    firebase.auth().signInWithEmailAndPassword(email,password)
+    auth.signInWithEmailAndPassword(email,password)
     .then(function(result){
         alert("Successfully logged in with "+email);
     })
@@ -79,7 +91,7 @@ function signIn(){
 function signInGoogleAccount(){
     var provider = new firebase.auth.GoogleAuthProvider();
 
-    firebase.auth().signInWithPopup(provider).then(function(result) {
+    auth.signInWithPopup(provider).then(function(result) {
         // This gives you a Google Access Token. You can use it to access the Google API.
         var token = result.credential.accessToken;
         // The signed-in user info.
@@ -102,13 +114,13 @@ function signInGoogleAccount(){
 
 // Sign out
 function signOut(){
-    firebase.auth().signOut();
-    alert("signed out").catch(function(error) {
+    auth.signOut();
+    /*alert("signed out").catch(function(error) {
         // Handle Errors here.
         var errorCode = error.code;
         var errorMessage = error.message;
         alert(errorMessage);
-      });
+      });*/
 }
 
 //Returns current user info
@@ -126,16 +138,23 @@ function returnCurrentUser(){
 
 // Sends an verification mail to the email account with a link
 // *This function should be called after Sign up for new account
-function verifyEmail(){
+function sendVerifyEmail(){
+    alert("Verification mail was sent! Please check your mailbox.");
+    user.sendEmailVerification();
+}
+
+//Checks if the current user is verified
+function checksIfVerified(){
     var user = returnCurrentUser();
     if(user.emailVerified){
         alert("Verification on '"+user.email+"' was successful");
-        return;
+        return true;
     }
-    alert("Verification mail was sent! Please check your mailbox.");
-    user.sendEmailVerification()
-        .addOnCompleteListener((task)=>{
-            //Show the page where it says
-            alert("Verification on '"+user.email+"' was successful"); 
-        });
+    return false;
 }
+
+
+//Add event listeners instead of these globals
+window.signIn = signIn;
+window.signOut = signOut;
+window.signInGoogleAccount = signInGoogleAccount;

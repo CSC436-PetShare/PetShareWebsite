@@ -1,5 +1,5 @@
 /*
-	Usage: This javascript is used with Post.html to create a MVC structure
+	Usage: This javascript is used with home.html to create a MVC structure
 */
 var globals = {
     signals: {
@@ -7,20 +7,11 @@ var globals = {
     }
 }
 
-var config = {
-    apiKey: "AIzaSyBq4vLcktzEWiKuyvAnDfSW6KivKVg6gag",
-    authDomain: "petshare-92cfa.firebaseapp.com",
-    databaseURL: "https://petshare-92cfa.firebaseio.com/",
-    storageBucket: "gs://petshare-92cfa.appspot.com/"
-};
+import {fb} from './firebaseInit.js'
 
-firebase.initializeApp(config);
-
-
-var db = firebase.database();
-//Points to the root reference
-var storage = firebase.storage();
-
+var db = fb.database();
+var storage = fb.storage();
+var auth = fb.auth();
 
 /*
 object acting function: makeSignaller
@@ -72,7 +63,7 @@ var m_PostModel =  function() {
 					image: image.name,
 					title: title,
 					upvotes: 0,
-					user: ""
+					user: auth.currentUser.uid
 				});
 			
 			}
@@ -158,16 +149,21 @@ var v_PostsView = function(model, controller, elmId) {
 		// update view
 		for(var i = 0; i < list.length; i++){
 			var post = document.createElement('div'); // Create new div
+			var user = document.createElement('p');
 			var title = document.createElement('p');
 			var img = document.createElement('img');
-			img.setAttribute('id', 'image' + i);
-			_getReference(img, list[i][1]);
-			
-			img.setAttribute('id', 'image' + i);
+			//Set User
+			user.innerHTML = list[i][4];
+
+			//Set title
 			title.innerHTML = list[i][0];
+			//Set image
+			img.setAttribute('id', 'image' + i);
+			_getReference(img, list[i][1]);		
+
 			post.setAttribute('class', 'post');
 
-			
+			post.append(user);
 			post.append(title);
 			post.append(img);
 		    _elm.append(post); // Add child to the parent element
@@ -199,7 +195,7 @@ var v_submitPostButton = function(model, btn, textfield, imageField){
 		    image: imageField.files[0]
 		})
 		textfield.value = "";
-		imageField.files[0] = null;
+		imageField.value = "";
     });
 
     return {
