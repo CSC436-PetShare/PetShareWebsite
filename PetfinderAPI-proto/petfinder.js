@@ -1,6 +1,6 @@
 
-import { Client } from "/@petfinder/petfinder-js";
-// var petfinder = require("@petfinder/petfinder-js");
+// import { Client } from "/@petfinder/petfinder-js";
+var petfinder = require("@petfinder/petfinder-js");
 
 
 const petFinderKey = "S2t3nrRa8vSmzQDxActpsXAhglEQdF5rvVQWfLBKQlT3ByXXia";
@@ -22,7 +22,7 @@ var settings = function (spec, value) {
 }
 
 var find_pet = function () {
-    var client = new Client({
+    var client = new petfinder.Client({
         apiKey: petFinderKey,
         secret: petFinderSecret 
     });;
@@ -38,8 +38,8 @@ var find_pet = function () {
     });
 }
 //Returns information about the type
-var fillViewWithPetType = function(){
-    var client = new Client({
+var returnAnimalType = function(){
+    var client = new petfinder.Client({
         apiKey: petFinderKey,
         secret: petFinderSecret 
     });;
@@ -48,17 +48,10 @@ var fillViewWithPetType = function(){
         response => {
             var types = response.data.types;
 
-            var html_select = document.createElement("Select");
-            html_select.setAttribute("id","typeSelect");
-            view.appendChild(html_select);
-            view.appendChild(html_input);
             for(i in types){
-                var option = document.createElement("option");
-                option.setAttribute("value", types[i].name);
-                html_select.appendChild(option);
                 console.log( types[i].name);
             }
-            console.log(html_select.innerText);
+            console.log(response.data);
         }
     )
 
@@ -67,3 +60,5 @@ var fillViewWithPetType = function(){
 // settings("type", "Dog");
 // settings("coat", "Long");
 // settings("size","Extra Large");
+
+fillViewWithPetType();
