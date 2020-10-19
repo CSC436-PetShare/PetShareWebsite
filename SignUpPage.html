@@ -8,7 +8,7 @@
         <!-- The core Firebase JS SDK is always required and must be listed first -->
         <script src="https://www.gstatic.com/firebasejs/7.22.0/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/7.22.0/firebase-auth.js"></script>
-        <script type="text/javascript" src="authentication.js"></script>
+        <script type="module" src="authentication.js"></script>
     </head>
 
     <a href="login_demo.html" onClick="">Go back</a>
@@ -18,8 +18,9 @@
         <form id="formContainer" method="post">
             <input type="email" placeholder="Enter valid Email address" id="email"/><br>
             <input type="password" placeholder="Password" id="password"/><br>
+            <input type="text" placeholder="Username" id="userName"/><br>
 
-            <input type="button"  onclick="signUpWithEmailAndPassword()" value="Sign Up">
+            <input type="button" value="Sign Up">
         </form>
 
 

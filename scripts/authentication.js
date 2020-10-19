@@ -7,6 +7,17 @@
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
+var file = {
+    signals: {
+    sIn: 'SIGNIN',
+    sOut: 'SIGNOUT',
+    sInGoogle: 'SIGNINGOOGLE',
+    sUp: 'SINGUP'
+
+    }
+}
+
 import {fb} from './firebaseInit.js'
 
 
@@ -37,15 +48,15 @@ auth.onAuthStateChanged(function(user) {
 
 
 // Sign up with email & address
-function signUpWithEmailAndPassword(){
-    var email = document.getElementById("email").value;
-    var password = document.getElementById("password").value;
+function signUpWithEmailAndPassword(email, password, user){
 
     // const promise = auth.createUserWithEmailAndPassword(email.value,password.value);
     auth.createUserWithEmailAndPassword(email, password)
     .then(function(){
         sendVerifyEmail();
-        signOut();
+        auth.currentUser.updateProfile({
+            displayName: user 
+        });
     })
     .catch(function(error) {
         // Handle Errors here.
@@ -69,9 +80,7 @@ function signUpWithEmailAndPassword(){
 }
 
 // Sign in with email & address if the user has verified with the actual email address
-function signIn(){
-    var email = document.getElementById("email").value;
-    var password = document.getElementById("password").value;
+function signIn(email, password){
 
     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
 
@@ -85,11 +94,12 @@ function signIn(){
         var errorMessage = error.message;
         alert(errorMessage);
       });
+
 }
 
 // Shows pop up which lets the user to sign in with google account
 function signInGoogleAccount(){
-    var provider = new firebase.auth.GoogleAuthProvider();
+    var provider = new fb.auth.GoogleAuthProvider();
 
     auth.signInWithPopup(provider).then(function(result) {
         // This gives you a Google Access Token. You can use it to access the Google API.
@@ -140,6 +150,7 @@ function returnCurrentUser(){
 // *This function should be called after Sign up for new account
 function sendVerifyEmail(){
     alert("Verification mail was sent! Please check your mailbox.");
+    user = returnCurrentUser();
     user.sendEmailVerification();
 }
 
@@ -153,8 +164,159 @@ function checksIfVerified(){
     return false;
 }
 
+//Controller to handle events sent by the buttons
+var c_Controller = function(model) {
+    return {
+    dispatch: function(evt) {
+        switch(evt.type) { // We will do something different depending on the event type
+        case (file.signals.sIn): 
+            signIn(evt.email, evt.password); 
+            break;
+        case (file.signals.sOut):
+            signOut();
+            break;
+        case (file.signals.sInGoogle):
+            signInGoogleAccount();
+            break;
+        case (file.signals.sUp):
+            signUpWithEmailAndPassword(evt.email, evt.password, evt.user);
+            break;
+        default: // Unrecognized event or event not given
+            console.log('Uncrecognized event:', evt.type); // Print what the bad value is
+        }
+    }
+    }
+}
+
+//Add button event listener for sign in button
+var signInButton = function(btn, emailfield, passwordfield){
+    var _btn = document.getElementById(btn); // get the DOM node associated with the button
+    var _email = document.getElementById(emailfield);
+    var _password = document.getElementById(passwordfield);
+
+    var _observers = makeSignaller();
+
+    // event listener waiting for click of button
+    _btn.addEventListener('click', function() {
+        _observers.notify({
+            type: file.signals.sIn,
+            email: _email.value,
+            password: _password.value
+        })
+        passwordfield.value = "";
+        emailfield.value = "";
+    });
+
+    return {
+        // We add observers to our signaller with the signaller's add
+        // function
+        register: function(handler) {
+            _observers.add(handler);
+        },
+
+        render: function() {
+            _btn.setAttribute('class', 'signInButton');
+        }
+    }
+}
+
+//Add event listener for sign out button
+var signOutButton = function(btn){
+    var _btn = document.getElementById(btn); // get the DOM node associated with the button
+
+    var _observers = makeSignaller();
+
+    // event listener waiting for click of button
+    _btn.addEventListener('click', function() {
+        _observers.notify({
+            type: file.signals.sOut
+        })
+    });
+
+    return {
+        // We add observers to our signaller with the signaller's add
+        // function
+        register: function(handler) {
+            _observers.add(handler);
+        },
+
+        render: function() {
+            _btn.setAttribute('class', 'signInButton');
+        }
+    }
+}
+
+//Add event listener for sign in with google button
+var signInWithGoogleButton = function(btn){
+    var _btn = document.getElementById(btn); // get the DOM node associated with the button
+
+    var _observers = makeSignaller();
+
+    // event listener waiting for click of button
+    _btn.addEventListener('click', function() {
+        _observers.notify({
+            type: file.signals.sInGoogle
+        })
+    });
+
+    return {
+        // We add observers to our signaller with the signaller's add
+        // function
+        register: function(handler) {
+            _observers.add(handler);
+        },
+
+        render: function() {
+            _btn.setAttribute('class', 'signInButton');
+        }
+    }
+}
+
+//Add event listener for sign in with google button
+var signUpButton = function(btn, userfield, emailfield, passwordfield){
+    var _btn = document.getElementById(btn); // get the DOM node associated with the button
+    var _email = document.getElementById(emailfield);
+    var _password = document.getElementById(passwordfield);
+    var _user = document.getElementById(userfield);
+
+    var _observers = makeSignaller();
+
+    // event listener waiting for click of button
+    _btn.addEventListener('click', function() {
+        _observers.notify({
+            type: file.signals.sUp,
+            email: _email.value,
+            password: _password.value,
+            user: _user.value
+
+        })
+    });
+
+    return {
+        // We add observers to our signaller with the signaller's add
+        // function
+        register: function(handler) {
+            _observers.add(handler);
+        },
+
+        render: function() {
+            _btn.setAttribute('class', 'signInButton');
+        }
+    }
+}
 
 //Add event listeners instead of these globals
-window.signIn = signIn;
-window.signOut = signOut;
-window.signInGoogleAccount = signInGoogleAccount;
+window.addEventListener('DOMContentLoaded', function() {
+    //var theModel = m_AuthModel(); // We have one model
+    var theController = c_Controller();
+
+    var _signInButton = signInButton("signInButn","email","password");
+    var _signOutButton = signInButton("signOutButn");
+    var _signInWithGoogleButton = signInButton("signInGoogleButn");
+    var _signUpButton = signInButton("signInButn","email","password", "userName");
+
+    _signInButton.register(theController.dispatch);
+    _signOutButton.register(theController.dispatch);
+    _signInWithGoogleButton.register(theController.dispatch);
+    _signUpButton.register(theController.dispatch);
+}
