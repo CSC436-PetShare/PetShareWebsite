@@ -30,6 +30,28 @@ var auth = fb.auth();
 //     }
 // })
 
+/*
+object acting function: makeSignaller
+param: none
+create a array of _subscribers which is used as an event queue
+*/
+var makeSignaller = function() {
+    var _subscribers = [];
+
+    return {
+    // Register a function with the notification system
+    add: function(handlerFunction) { _subscribers.push(handlerFunction); },
+
+    // Loop through all registered functions nad call them with passed
+    // arguments
+    notify: function(args) {
+        for (var i = 0; i < _subscribers.length; i++) {
+        _subscribers[i](args);
+        }
+    }
+    };
+}
+
 //Change 'home_url' to appropriate page later
 const home_url = 'home.html';
 auth.onAuthStateChanged(function(user) {
@@ -48,15 +70,20 @@ auth.onAuthStateChanged(function(user) {
 
 
 // Sign up with email & address
-function signUpWithEmailAndPassword(email, password, user){
+async function signUpWithEmailAndPassword(email, password, user){
 
     // const promise = auth.createUserWithEmailAndPassword(email.value,password.value);
-    auth.createUserWithEmailAndPassword(email, password)
-    .then(function(){
-        sendVerifyEmail();
-        auth.currentUser.updateProfile({
-            displayName: user 
+    if(user.includes(" ")) {
+    	 alert("User name cannot have spaces");
+    	 return;
+    }
+    await auth.createUserWithEmailAndPassword(email, password)
+    .then(function(result){
+    	var _user = "" + user;
+        result.user.updateProfile({
+            displayName: _user 
         });
+        result.user.sendVerifyEmail();
     })
     .catch(function(error) {
         // Handle Errors here.
@@ -169,7 +196,7 @@ var c_Controller = function(model) {
     return {
     dispatch: function(evt) {
         switch(evt.type) { // We will do something different depending on the event type
-        case (file.signals.sIn): 
+        case (file.signals.sIn):
             signIn(evt.email, evt.password); 
             break;
         case (file.signals.sOut):
@@ -203,8 +230,7 @@ var signInButton = function(btn, emailfield, passwordfield){
             email: _email.value,
             password: _password.value
         })
-        passwordfield.value = "";
-        emailfield.value = "";
+
     });
 
     return {
@@ -248,6 +274,7 @@ var signOutButton = function(btn){
 
 //Add event listener for sign in with google button
 var signInWithGoogleButton = function(btn){
+
     var _btn = document.getElementById(btn); // get the DOM node associated with the button
 
     var _observers = makeSignaller();
@@ -273,7 +300,7 @@ var signInWithGoogleButton = function(btn){
 }
 
 //Add event listener for sign in with google button
-var signUpButton = function(btn, userfield, emailfield, passwordfield){
+var signUpButton = function(btn, emailfield, passwordfield, userfield){
     var _btn = document.getElementById(btn); // get the DOM node associated with the button
     var _email = document.getElementById(emailfield);
     var _password = document.getElementById(passwordfield);
@@ -304,19 +331,24 @@ var signUpButton = function(btn, userfield, emailfield, passwordfield){
         }
     }
 }
-
 //Add event listeners instead of these globals
 window.addEventListener('DOMContentLoaded', function() {
     //var theModel = m_AuthModel(); // We have one model
     var theController = c_Controller();
 
-    var _signInButton = signInButton("signInButn","email","password");
-    var _signOutButton = signInButton("signOutButn");
-    var _signInWithGoogleButton = signInButton("signInGoogleButn");
-    var _signUpButton = signInButton("signInButn","email","password", "userName");
 
-    _signInButton.register(theController.dispatch);
-    _signOutButton.register(theController.dispatch);
-    _signInWithGoogleButton.register(theController.dispatch);
-    _signUpButton.register(theController.dispatch);
-}
+    var path = window.location.pathname;
+    var page = path.split("/").pop();
+    if(page != "SignUpPage.html") {
+        var b_signInButton = signInButton("signInButn","email","password");
+        var b_signOutButton = signOutButton("signOutButn");
+        var b_signInWithGoogleButton = signInWithGoogleButton("signInGoogleButn");
+        b_signInButton.register(theController.dispatch);
+        b_signOutButton.register(theController.dispatch);
+        b_signInWithGoogleButton.register(theController.dispatch);
+    }
+    else {
+        var b_signUpButton = signUpButton("signUpButn","email","password", "userName");
+        b_signUpButton.register(theController.dispatch);
+    }
+});
