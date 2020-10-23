@@ -4,6 +4,8 @@
 	<head>
         <title>Adoption</title>
         <link rel="stylesheet" type="text/css" href="style.css" />
+	<script type="module" src="scripts/adopt.js"></script>
+	<!-- <script type="module" src="scripts/petfinder.js"></script> -->
    	</head>
 
 	<body>
@@ -19,6 +21,16 @@
            <li><a id='settings' href='settings.html'>Settings</a></li>
         </ul>
 
-	</body>
+
+	<form>
+		<label for="animals">Choose a animal:</label>
+		<select name="animals" id="animals"></select>
+
+		<!-- starts off hidden, until animal is chosen -->
+		<div id="attributesView"></div>
+		<input type="submit" value="Submit" id="submitButton">
+	</form>
+        </body>
+        
 	
 </html>
