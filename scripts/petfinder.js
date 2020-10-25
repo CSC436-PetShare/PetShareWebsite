@@ -1,7 +1,7 @@
 //1. for node js testing
 // var petfinder = require("@petfinder/petfinder-js");
 //2. for browser
-import {Client} from '/@petfinder/petfinder-js';
+//import {Client} from './@petfinder/petfinder-js/dist/petfinder.js';
 
 const petFinderKey = "S2t3nrRa8vSmzQDxActpsXAhglEQdF5rvVQWfLBKQlT3ByXXia";
 const petFinderSecret = "dyFrO08uwicmha6hFDziKndaMhjgk4Wk1joLrYgd";
@@ -17,7 +17,10 @@ var pet_spec = {
     //MAX LIMIT: 50
 }
 
-
+var animal_attributes;
+var types_arr = [];
+var attribute_arr = [];
+var find_pet_response;
 
 //Setup type of animal you want to search before calling the find_pet function
 // to return the results of available pets
@@ -28,27 +31,29 @@ var settings = function (spec, value) {
 }
 
 
-var find_pet = async () =>{
+var find_pet = async function() {
 
     await client.animal.search(pet_spec)
     .then(function (response) {
         // Do something with `response.data.animals`
         console.log(response.data);
-        return response.data;
+        find_pet_response = response.data;
+        //return response.data;
     }).catch(function (error) {
         // Handle the error
+        find_pet_response = null;
         return null;
     });
 }
 //Returns information about the type
-var returnAnimalType = function(){
+var returnAnimalType = async function(){
 
-    client.animalData.types().then(
+    await client.animalData.types().then(
         function(response) {
-            var types_arr = [];
+            types_arr = [];
             var types = response.data.types;
 
-            for(i in types){
+            for(var i in types){
                 types_arr.push(types[i].name);
             }
             // console.log(types_arr);
@@ -57,19 +62,20 @@ var returnAnimalType = function(){
     )
 }
 
-var returnAnimalAttributes = function(type){
-    client.animalData.types().then(
+var returnAnimalAttributes = async function(type){
+    await client.animalData.types().then(
         function(response) {
             var types = response.data.types;
             var animal_attributes;
-            for(i in types){
+            for(var i in types){
                 if(types[i].name === type){
                     animal_attributes = types[i];
                 }
             }
 
-            var attribute_arr = [];
-            for(attribute in animal_attributes){
+            attribute_arr = [];
+            for(var attribute in animal_attributes){
+                console.log(attribute);
                 attribute_arr.push(attribute);
             }
             console.log(attribute_arr);
@@ -78,12 +84,12 @@ var returnAnimalAttributes = function(type){
     )
 }
 
-var returnAnimalAttributesObject = function(type){
-    client.animalData.types().then(
+var returnAnimalAttributesObject = async function(type){
+    await client.animalData.types().then(
         function(response) {
             var types = response.data.types;
             var animal_attributes;
-            for(i in types){
+            for(var i in types){
                 if(types[i].name === type){
                     animal_attributes = types[i];
                 }
@@ -95,23 +101,26 @@ var returnAnimalAttributesObject = function(type){
 
 var petfinder_controller = {
     //Returns possible animal types
-    returnAnimalType: function(){
-        return returnAnimalType();
+    returnAnimalType: async function(){
+        await returnAnimalType();
+        return types_arr;
     },
-    returnAnimalAttributes: function(type){
-        return returnAnimalAttributes();
+    returnAnimalAttributes: async function(type){
+        await returnAnimalAttributes(type);
+        return attribute_arr;
     },
-    settings: function(spec, value){
+    settings: async function(spec, value){
         return settings(spec, value);
     },
-    find_pet: function(){
-        return find_pet();
+    find_pet: async function(){
+        await find_pet();
+        return find_pet_response;
     }
 }
 
-// console.log(returnAnimalFeaturesObject("Dog"));
+//console.log(petfinder_controller.returnAnimalAttributes("Dog"));
 // settings("coat", "Long");
 // settings("size","Extra Large");
 returnAnimalAttributesObject("Rabbit");
 
-// export {petfinder_controller};
+export {petfinder_controller};
