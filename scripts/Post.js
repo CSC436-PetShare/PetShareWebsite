@@ -4,7 +4,9 @@
 var globals = {
     signals: {
 	post: 'POST',
-	comment: 'COMMENT'
+	comment: 'COMMENT',
+	adore: 'ADORE',
+	remove: 'REMOVE'
     }
 }
 
@@ -58,13 +60,16 @@ var m_PostModel =  function() {
 				//TODO: remove spaces from image name
 				await storage.ref("images/" + image.name).put(image);
 				// Get a key for a new Post.
+				console.log(auth.currentUser.displayName);
   				var newPostKey = db.ref().child('posts').push().key;
 				await db.ref('posts/' + newPostKey).set({
-					comments: ['Lol so cute', 'same'],
+					comments: {},
 					image: image.name,
 					title: title,
-					upvotes: 0,
-					user: auth.currentUser.uid
+					adoreCount: 0,
+					adores: {},
+					uid: auth.currentUser.uid,
+					name: auth.currentUser.displayName
 				});
 			
 			}
@@ -85,9 +90,11 @@ var m_PostModel =  function() {
       			index 0 = title
       			index 1 = image name
       			index 2 = comments
-      			index 3 = upvotes
-      			index 4 = user
-      			index 5 = post
+      			index 3 = adoreCount
+      			index 4 = adores
+      			index 5 = uid
+      			index 6 = name
+      			index 7 = post
       			*/
       		
       		
@@ -95,32 +102,73 @@ var m_PostModel =  function() {
       			childData.push(childSnapshot.child("title").val());
       			childData.push(childSnapshot.child("image").val());
       			childData.push(childSnapshot.child("comments").val());
-      			childData.push(childSnapshot.child("upvotes").val());
-      			childData.push(childSnapshot.child("user").val());
+      			childData.push(childSnapshot.child("adoreCount").val());
+      			childData.push(childSnapshot.child("adores").val());
+      			childData.push(childSnapshot.child("uid").val());
+      			childData.push(childSnapshot.child("name").val());
       			childData.push(key);
 
       			newList.push(childData);
   				});
 			}).then(() => {_postList = newList});
 		},
-
-		submitComment: async function(post, text, commentList) {
-			console.log(post);
-			console.log(text);
-			console.log(commentList);
-			commentList.push(text);
-			db.ref("posts/" + post).update({
+		//Submits a comment to the post argument 
+		submitComment: async function(post, text) {
+			var commentList;
+			await db.ref(post + "/comments").once('value').then(function(snapshot){
+				commentList = snapshot.val();
+			});
+			if (commentList == null){
+				commentList = [text];
+			}
+			else {
+				commentList.push(text);
+			}
+			db.ref(post).update({
 				comments: commentList
 			});
 			_observers.notify();
 		},
-
-		deletePost: function(index) {
-			console.log("deleted post " + _postList[index]);
-			_postList.splice(index, 1);
+		//Removes a post and its image
+		removePost: function(post, image) {
+			db.ref(post).remove();
+			storage.ref("images/" + image).delete();
 			_observers.notify();
 		},
-
+		//Add or subtracts adores for a post based on if the user has already adored or not
+		toggleAdore: async function (post, uid) {
+			var postRef = db.ref(post);
+			//Get adoreCount and adoresList
+			var adoreC;
+			var adoresList;
+			await db.ref(post + "/adoreCount").once('value').then(function(snapshot){
+				adoreC = snapshot.val();
+			});
+			await db.ref(post + "/adores").once('value').then(function(snapshot){
+				adoresList = snapshot.val();
+			});
+			//Add or subtract from the aodres list and adoresCount
+  			if (adoresList && adoresList[uid]) {
+    			adoreC--;
+    			adoresList[uid] = null;
+    			await postRef.update({
+    				adoreCount: adoreC,
+    				adores: adoresList
+    			});
+  			} else {
+    			adoreC++;
+    			if (!adoresList) {
+      				adoresList = {};
+    			}
+    			adoresList[uid] = true;
+    			await postRef.update({
+    				adoreCount: adoreC,
+    				adores: adoresList
+    			});
+  			}
+		_observers.notify();
+		},
+		//Returns a a postlist which contains info on all the posts
 		getPostList: async function() {
 			await this.getData();
 			return _postList;
@@ -129,12 +177,14 @@ var m_PostModel =  function() {
     }
 }
 
+//Creates a view which is populated by user posts
 var v_PostsView = function(model, controller, elmId) {
     var _model = model; // internal handle to the model, though we could use the parameter as well
     var _elm = document.getElementById(elmId); // get the DOM node associated with the element
     var _controller = controller;
     var _observers = makeSignaller();
 
+    //Gets the image reference
     var _getReference = async function (elm, imageName){
     	await storage.ref("images/" + imageName).getDownloadURL().then(function(url) {
        			elm.src = url;
@@ -173,44 +223,91 @@ var v_PostsView = function(model, controller, elmId) {
 			var newComment = document.createElement('div');
 			var commentBox = document.createElement('input');
 			var submitComment = document.createElement('input');
+			var adoreButton = document.createElement('input');
+			var adoredLabel = document.createElement('label');
 
 			//Set commentsLabel
 			commentsLabel.innerHTML = "Comments:";
 			//Set User
-			user.innerHTML = list[i][4];
+			user.innerHTML = list[i][6];
 			//Set title
 			title.innerHTML = list[i][0];
 			//Set image
 			img.setAttribute('id', 'image' + i);
 			_getReference(img, list[i][1]);		
-			//Create comments
-			var comments = v_createComments(list[i][2]);
 			//Set up newComment div
 			commentBox.type = "text";
+			commentBox.setAttribute("id", "comBox" + list[i][7]);
 			submitComment.type = "button";
 			submitComment.value = "Submit Comment";
-			var commentList = list[i][2];
-			var currentPost = list[i][5];
+
+			//Add an event listen for the submitComment button to add comments
+			submitComment.setAttribute("class", list[i][7])
 			submitComment.addEventListener('click', function() {
+				var currentPost = this.getAttribute("class");
+				var comValue = document.getElementById("comBox" + currentPost).value;
+				//console.log(currentPost);
+
 				_observers.notify({
 		   			type: globals.signals.comment,
-		    		text: auth.currentUser.uid + ": " + commentBox.value,
-		    		comments: commentList,
-		    		post: currentPost
+		    		text: auth.currentUser.displayName + ": " + comValue,
+		    		post: "posts/" + currentPost
 				})
 				commentBox.value = "";
     		});
 			newComment.append(commentBox);
 			newComment.append(submitComment);
 
-			post.setAttribute('class', 'post');
+			//Create adored button and label
+			adoreButton.type = "button";
+			adoreButton.value = "Adored";
+			adoredLabel.innerHTML = ": " + list[i][3];
+			adoreButton.setAttribute("class", list[i][7])
+			adoreButton.addEventListener('click', function() {
+				var currentPost = this.getAttribute("class");
+				//console.log(currentPost);
+					_observers.notify({
+		   				type: globals.signals.adore,
+		    			postRef: "posts/" + currentPost,
+		    			uid: auth.currentUser.uid
+					})
+    			});
 
+			//Append elements to the post
+			post.setAttribute('class', 'post');
 			post.append(user);
 			post.append(title);
 			post.append(img);
+			post.append(adoreButton);
+			post.append(adoredLabel)
 			post.append(commentsLabel);
 			post.append(newComment);
-			post.append(comments);
+			if(list[i][2] != null){
+				//Create comments
+				var comments = v_createComments(list[i][2]);
+				post.append(comments);
+			}
+
+			//If the currentUser owns the post then add a delete button
+			var userId = list[i][5];
+			if(userId === auth.currentUser.uid){
+				var removeButton = document.createElement('input');
+				removeButton.type = "button";
+				removeButton.value = "Remove"
+				var currentImage = list[i][1];
+				removeButton.setAttribute("class", list[i][7])
+				removeButton.addEventListener('click', function() {
+					var currentPost = this.getAttribute("class");
+				console.log(currentPost);
+					_observers.notify({
+		   				type: globals.signals.remove,
+		    			image: currentImage,
+		    			post: "posts/" + currentPost
+					})
+    			});
+    			post.append(removeButton);
+			}
+
 		    _elm.append(post); // Add child to the parent element
 		}
     }
@@ -260,6 +357,9 @@ var v_submitPostButton = function(model, btn, textfield, imageField){
 }
 
 var v_createComments = function(comments) {
+	if(comments === null){
+		return;
+	}
 	var elm = document.createElement('div');
 	for(var i = 0; i < comments.length; i++){
 		var commentElm = document.createElement('div');
@@ -295,7 +395,13 @@ var c_Controller = function(model) {
 		    _model.submitPost(evt.title, evt.image); 
 		    break;
 		case (globals.signals.comment):
-		    _model.submitComment(evt.post, evt.text, evt.comments);
+		    _model.submitComment(evt.post, evt.text);
+		    break;
+		case (globals.signals.adore):
+		    _model.toggleAdore(evt.postRef, evt.uid);
+		    break;
+		case (globals.signals.remove):
+		    _model.removePost(evt.post, evt.image);
 		    break;
 		default: // Unrecognized event or event not given
 		    console.log('Uncrecognized event:', evt.type); // Print what the bad value is
