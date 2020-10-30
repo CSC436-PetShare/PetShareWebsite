@@ -3,13 +3,10 @@ import {petfinder_controller} from './petfinder.js';
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ++++++++++++++++++++++ testing arrays ++++++++++++++++++++++
-var animals  = ["Dog", 
-"Cat", 
-"Fish"];
-
-//var animals = petfinder_controller.returnAnimalType();
-
+var animals;
 // ++++++++++++++++++++++ DOG setup ++++++++++++++++++++++
+var getAttributes;
+
 var getAttributes_dog =   ["Breeds", 
 					   	   "Coats", 
 					   	   "Colors",
@@ -98,16 +95,18 @@ var getGenders_fish =   ["Male",
 	example: [dogAttrArray, catAttrArray, fishAttrArray]
 */ 
 var getAnimalAttributesValues = function(animalName){
-	if(animalName === "Dog"){
-		return [getBreeds_dog, getCoats_dog, getColors_dog, getGenders_dog];
-	} else if(animalName === "Cat"){
-		return [getBreeds_cat, getCoats_cat, getColors_cat, getGenders_cat];
-	} else if(animalName === "Fish"){
-		return [getBreeds_fish, getColors_fish, getGenders_fish];
-	} else {
-		console.log("invalid animalName: " + animalName);
-		return null;
-	}
+
+
+	// if(animalName === "Dog"){
+	// 	return [getBreeds_dog, getCoats_dog, getColors_dog, getGenders_dog];
+	// } else if(animalName === "Cat"){
+	// 	return [getBreeds_cat, getCoats_cat, getColors_cat, getGenders_cat];
+	// } else if(animalName === "Fish"){
+	// 	return [getBreeds_fish, getColors_fish, getGenders_fish];
+	// } else {
+	// 	console.log("invalid animalName: " + animalName);
+	// 	return null;
+	// }
 }
 
 /*
@@ -120,16 +119,18 @@ var getAnimalAttributesValues = function(animalName){
 	example: [breeds, coats, colors, genders]
 */ 
 var getAnimalAttributes = function(animalName){
-	if(animalName === "Dog"){
-		return getAttributes_dog;
-	} else if(animalName === "Cat"){
-		return getAttributes_cat;
-	} else if(animalName === "Fish"){
-		return getAttributes_fish;
-	} else {
-		console.log("invalid animalName: " + animalName);
-		return null;
-	}
+
+
+	// if(animalName === "Dog"){
+	// 	return getAttributes_dog;
+	// } else if(animalName === "Cat"){
+	// 	return getAttributes_cat;
+	// } else if(animalName === "Fish"){
+	// 	return getAttributes_fish;
+	// } else {
+	// 	console.log("invalid animalName: " + animalName);
+	// 	return null;
+	// }
 }
 
 /*
@@ -168,7 +169,12 @@ window.addEventListener('DOMContentLoaded', function() {
 
 	var animalDropdown = document.getElementById('animals');
 	animalDropdown.required = true;
-	setDropdown(animalDropdown, animals);
+
+	petfinder_controller.returnAnimalType().then(arr=>{
+		animals = arr;
+		setDropdown(animalDropdown, animals);
+	});
+
 	var attributesView = document.getElementById('attributesView');
 	var submitButton = document.getElementById('submitButton');
 
@@ -178,23 +184,48 @@ window.addEventListener('DOMContentLoaded', function() {
 		}
 
 		console.log('You selected: ', this.value);
-		var attributes = getAnimalAttributes(this.value);
-		var attributesValues = getAnimalAttributesValues(this.value);
 
-		if(this.value !== "unselected"){
-			for(var i = 0; i < attributesValues.length; i++) {
+		var attributes, attributesValues;
+		
+		// var attributes = getAnimalAttributes(this.value);
 
-				var attributeSelect = document.createElement('select');
-				attributeSelect.required = true;
+		petfinder_controller.returnAnimalAttributes(this.value).then(arr=>{
+			attributes = arr;
+			attributes.shift(); //remove animal name itself from the attribute
+			attributes.pop(); //remove animal link from the attribute **can be used if needed later
 
-				var label = document.createElement('label');
-				label.innerHTML = attributes[i];
+			attributesValues = [];
+			petfinder_controller.returnAnimalAttributesObject(this.value).then(obj=>{
+				attributes.forEach(function(s){
+					attributesValues.push(obj[s]);
+				})
 
-				attributesView.append(label);
-				attributesView.append(attributeSelect);
-				setDropdown(attributeSelect, attributesValues[i]);
-			}
-		}	
+
+				if(this.value !== "unselected"){
+					for(var i = 0; i < attributesValues.length; i++) {
+		
+						var attributeSelect = document.createElement('select');
+						attributeSelect.required = true;
+		
+						var label = document.createElement('label');
+						label.innerHTML = attributes[i];
+		
+						attributesView.append(label);
+						attributesView.append(attributeSelect);
+						setDropdown(attributeSelect, attributesValues[i]);
+					}
+				}	
+
+			});
+
+		});
+
+
+		// var attributesValues = getAnimalAttributesValues(this.value);
+
+
+
+
 	});
 
 	submitButton.addEventListener("click", submitButtonHandler);

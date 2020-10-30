@@ -21,6 +21,7 @@ var animal_attributes;
 var types_arr = [];
 var attribute_arr = [];
 var find_pet_response;
+var animal_attributes_obj;
 
 //Setup type of animal you want to search before calling the find_pet function
 // to return the results of available pets
@@ -45,9 +46,9 @@ var find_pet = async function() {
         return null;
     });
 }
-//Returns information about the type
-var returnAnimalType = async function(){
 
+//Returns arrays of possible animal types
+var returnAnimalType = async function(){
     await client.animalData.types().then(
         function(response) {
             types_arr = [];
@@ -56,7 +57,7 @@ var returnAnimalType = async function(){
             for(var i in types){
                 types_arr.push(types[i].name);
             }
-            // console.log(types_arr);
+            console.log(types_arr);
             return types_arr;
         }
     )
@@ -88,13 +89,13 @@ var returnAnimalAttributesObject = async function(type){
     await client.animalData.types().then(
         function(response) {
             var types = response.data.types;
-            var animal_attributes;
+            
             for(var i in types){
                 if(types[i].name === type){
-                    animal_attributes = types[i];
+                    animal_attributes_obj = types[i];
                 }
             }
-            return animal_attributes;
+            return animal_attributes_obj;
         }
     )
 }
@@ -115,12 +116,16 @@ var petfinder_controller = {
     find_pet: async function(){
         await find_pet();
         return find_pet_response;
+    },
+    returnAnimalAttributesObject: async function(type){
+        await returnAnimalAttributesObject(type);
+        return animal_attributes_obj;
     }
 }
 
 //console.log(petfinder_controller.returnAnimalAttributes("Dog"));
 // settings("coat", "Long");
 // settings("size","Extra Large");
-returnAnimalAttributesObject("Rabbit");
+// returnAnimalAttributesObject("Rabbit");
 
 export {petfinder_controller};
