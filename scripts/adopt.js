@@ -4,134 +4,8 @@ import {petfinder_controller} from './petfinder.js';
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ++++++++++++++++++++++ testing arrays ++++++++++++++++++++++
 var animals;
-// ++++++++++++++++++++++ DOG setup ++++++++++++++++++++++
-var getAttributes;
+var attributes;
 
-var getAttributes_dog =   ["Breeds", 
-					   	   "Coats", 
-					   	   "Colors",
-							  "Genders"];
-// var getAttributes_dog = petfinder_controller.returnAnimalAttributes("Dog");
-
-// var attributes_dog = petfinder_controller.returnAnimalAttributesObject("Dog");
-
-// attributes contains components as below
-//	{
-// 	name: 'Dog',
-// 	coats: [Array],
-// 	colors: [Array],
-// 	genders: [Array],
-// 	_links: [Object]
-//   }
-
-var getBreeds_dog =   ["Yorkie", 
-					   "Great Dane", 
-					   "Scoob"];
-// var getCoats_dog = attributes_dog["coats"];
-var getCoats_dog =   ["Bald",
-					  "Short",
-					  "Long", 
-					  "Shaggy"];
-
-var getColors_dog =   ["Brown", 
-					   "White", 
-					   "Black",
-					   "Grey"];
-
-var getGenders_dog =   ["Male", 
-					    "Female"];
-
-// ++++++++++++++++++++++ CAT setup ++++++++++++++++++++++
-var getAttributes_cat =   ["Breeds", 
-					   	   "Coats", 
-					   	   "Colors",
-					   	   "Genders"];
-
-var getBreeds_cat =   ["Saimese", 
-					   "Tabi", 
-					   "Sphnx"];
-
-var getCoats_cat =   ["Bald",
-					  "Short",
-					  "Long", 
-					  "Bushy"];
-
-var getColors_cat =   ["Brown", 
-					   "White", 
-					   "Black",
-					   "Orange",
-					   "Grey"];
-
-var getGenders_cat =   ["Male", 
-					    "Female"];
-
-// ++++++++++++++++++++ FISH setup ++++++++++++++++++++
-var getAttributes_fish =   ["Breeds", 
-					   	   "Colors",
-					   	   "Genders"];
-
-var getBreeds_fish =   ["Rex", 
-					   "Lionhead", 
-					   "Dutch"];
-
-var getColors_fish =   ["Brown", 
-					   	  "White", 
-					   	  "Black",
-					   	  "Grey"];
-
-var getGenders_fish =   ["Male", 
-					   	 "Female"];
-
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-/*
-	getAnimalAttributesvalues is a mock up getter function that uses the 
-	mock up arrays above. 
-
-	(The real version of this function will NOT be as hard coded as this.)
-
-	return: an array of attributes arrays for the specific animal
-	example: [dogAttrArray, catAttrArray, fishAttrArray]
-*/ 
-var getAnimalAttributesValues = function(animalName){
-
-
-	// if(animalName === "Dog"){
-	// 	return [getBreeds_dog, getCoats_dog, getColors_dog, getGenders_dog];
-	// } else if(animalName === "Cat"){
-	// 	return [getBreeds_cat, getCoats_cat, getColors_cat, getGenders_cat];
-	// } else if(animalName === "Fish"){
-	// 	return [getBreeds_fish, getColors_fish, getGenders_fish];
-	// } else {
-	// 	console.log("invalid animalName: " + animalName);
-	// 	return null;
-	// }
-}
-
-/*
-	getAnimalAttributes is a mock up getter function that uses the 
-	mock up arrays above. 
-
-	(The real version of this function will NOT be as hard coded as this.)
-
-	return: an array of attributes for the specific animal
-	example: [breeds, coats, colors, genders]
-*/ 
-var getAnimalAttributes = function(animalName){
-
-
-	// if(animalName === "Dog"){
-	// 	return getAttributes_dog;
-	// } else if(animalName === "Cat"){
-	// 	return getAttributes_cat;
-	// } else if(animalName === "Fish"){
-	// 	return getAttributes_fish;
-	// } else {
-	// 	console.log("invalid animalName: " + animalName);
-	// 	return null;
-	// }
-}
 
 /*
 	setDropdown creates a select element in the HTML
@@ -162,6 +36,18 @@ var setDropdown = function(dropdownEle, array){
 }
 
 var submitButtonHandler = function(){
+	attributes.forEach(function(attr){
+		var select_attribute = document.getElementById(attr);
+		if(attr === 'name'){
+			petfinder_controller.settings('type',select_attribute.value);
+		}else{
+			petfinder_controller.settings(attr,select_attribute.value);
+		}
+	});
+	petfinder_controller.find_pet().then(obj=>{
+		var animal_obj = obj['animals'];
+		alert(animal_obj);
+	});
 
 }
 
@@ -169,6 +55,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 	var animalDropdown = document.getElementById('animals');
 	animalDropdown.required = true;
+	animalDropdown.id = "name";
 
 	petfinder_controller.returnAnimalType().then(arr=>{
 		animals = arr;
@@ -185,19 +72,22 @@ window.addEventListener('DOMContentLoaded', function() {
 
 		console.log('You selected: ', this.value);
 
-		var attributes, attributesValues;
+		var attributesValues;
 		
-		// var attributes = getAnimalAttributes(this.value);
+		var animalName = this.value;
 
-		petfinder_controller.returnAnimalAttributes(this.value).then(arr=>{
+		petfinder_controller.returnAnimalAttributes(animalName).then(arr=>{
 			attributes = arr;
-			attributes.shift(); //remove animal name itself from the attribute
+			// attributes.shift(); //remove animal name itself from the attribute
 			attributes.pop(); //remove animal link from the attribute **can be used if needed later
 
 			attributesValues = [];
-			petfinder_controller.returnAnimalAttributesObject(this.value).then(obj=>{
-				attributes.forEach(function(s){
-					attributesValues.push(obj[s]);
+			petfinder_controller.returnAnimalAttributesObject(animalName).then(obj=>{
+				attributes.forEach(function(index){
+					if(index==='name'){
+						return;
+					}
+					attributesValues.push(obj[index]);
 				})
 
 
@@ -208,10 +98,11 @@ window.addEventListener('DOMContentLoaded', function() {
 						attributeSelect.required = true;
 		
 						var label = document.createElement('label');
-						label.innerHTML = attributes[i];
+						label.innerHTML = attributes[i+1];
 		
 						attributesView.append(label);
 						attributesView.append(attributeSelect);
+						attributeSelect.id = attributes[i+1];
 						setDropdown(attributeSelect, attributesValues[i]);
 					}
 				}	
@@ -219,12 +110,6 @@ window.addEventListener('DOMContentLoaded', function() {
 			});
 
 		});
-
-
-		// var attributesValues = getAnimalAttributesValues(this.value);
-
-
-
 
 	});
 

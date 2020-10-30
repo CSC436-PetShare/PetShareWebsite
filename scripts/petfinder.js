@@ -36,14 +36,11 @@ var find_pet = async function() {
 
     await client.animal.search(pet_spec)
     .then(function (response) {
-        // Do something with `response.data.animals`
-        console.log(response.data);
         find_pet_response = response.data;
-        //return response.data;
+        console.log(find_pet_response);
     }).catch(function (error) {
         // Handle the error
         find_pet_response = null;
-        return null;
     });
 }
 
@@ -110,7 +107,7 @@ var petfinder_controller = {
         await returnAnimalAttributes(type);
         return attribute_arr;
     },
-    settings: async function(spec, value){
+    settings: function(spec, value){
         return settings(spec, value);
     },
     find_pet: async function(){
@@ -121,11 +118,14 @@ var petfinder_controller = {
         await returnAnimalAttributesObject(type);
         return animal_attributes_obj;
     }
+
 }
 
 //console.log(petfinder_controller.returnAnimalAttributes("Dog"));
 // settings("coat", "Long");
 // settings("size","Extra Large");
+// settings("type","Dog");
+// find_pet();
 // returnAnimalAttributesObject("Rabbit");
 
-export {petfinder_controller};
+export {petfinder_controller, pet_spec};
