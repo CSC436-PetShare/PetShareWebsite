@@ -64,7 +64,7 @@ var m_PostModel =  function() {
   				var newPostKey = db.ref().child('posts').push().key;
 				await db.ref('posts/' + newPostKey).set({
 					comments: {},
-					image: image.name,
+					image: newPostKey + image.name,
 					title: title,
 					adoreCount: 0,
 					adores: {},
