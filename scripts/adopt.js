@@ -1,4 +1,4 @@
-import {petfinder_controller} from './petFinder.js';
+import {petfinder_controller} from './petfinder.js';
 
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -36,6 +36,7 @@ var setDropdown = function(dropdownEle, array){
 }
 
 var submitButtonHandler = function(){
+	console.log("Submit button clicked");
 	attributes.forEach(function(attr){
 		var select_attribute = document.getElementById(attr);
 		if(attr === 'name'){
@@ -112,6 +113,5 @@ window.addEventListener('DOMContentLoaded', function() {
 		});
 
 	});
-
 	submitButton.addEventListener("click", submitButtonHandler);
 });
