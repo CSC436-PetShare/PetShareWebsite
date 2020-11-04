@@ -3,7 +3,6 @@
     src: url(Format/Roboto);
 }
 
-
 body {
     margin: 0px;
     max-width: 100%;
@@ -101,12 +100,22 @@ footer {
 }
 
 #createPost {
+    font-family: Roboto-Thin;
     margin-top: 50px;
     float: right;
     width: 200px;
+    border: 1px solid #C4C4C4;
 }
 
 #postsView {
     padding-top: 50px;
     width: auto;
+}
+
+.button {
+    border: none;
+    background-color: #64A9DB;
+    width: 100px;
+    height: 30px;
+    margin-bottom: 20px;
 }
