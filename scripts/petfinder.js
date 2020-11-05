@@ -29,6 +29,7 @@ var animal_attributes_obj;
 
 var settings = function (spec, value) {
     pet_spec[spec] = value;
+    console.log(pet_spec);
 }
 
 
@@ -54,7 +55,6 @@ var returnAnimalType = async function(){
             for(var i in types){
                 types_arr.push(types[i].name);
             }
-            console.log(types_arr);
             return types_arr;
         }
     )
@@ -68,15 +68,14 @@ var returnAnimalAttributes = async function(type){
             for(var i in types){
                 if(types[i].name === type){
                     animal_attributes = types[i];
+                    console.log(animal_attributes);
                 }
             }
 
             attribute_arr = [];
             for(var attribute in animal_attributes){
-                console.log(attribute);
                 attribute_arr.push(attribute);
             }
-            console.log(attribute_arr);
             return attribute_arr;
         }
     )
