@@ -37,10 +37,17 @@ window.addEventListener('DOMContentLoaded', function() {
     })
     
 
-	var locationValue = "";
+    var locationValue = "";
+    var view = document.getElementById('shelterView');
 	locationDropdown.addEventListener("change", function(){
         locationValue = this.value;
-        petfinder_controller.searchOrganization(locationValue);
+        petfinder_controller.searchOrganization(locationValue).then(
+            organizations =>{
+                organizations.forEach(function(element){
+                    view.innerHTML += element['name']+'<br>';
+                });
+            }
+        );
 	});
 
 });
