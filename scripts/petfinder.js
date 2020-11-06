@@ -27,6 +27,10 @@
  * 
  * 6. returnAvailableLimits()
  *      : Returns the available search limit as an array
+ * 7. returnAvailableStates()
+ *      : Returns the available states(in US, abbreivated) as an array
+ * 8. searchOrganization(state)
+ *      : Returns the existing animal shelter organization in the state in US
  * 
  * Example Uses:
  * 1. returnAnimalType
@@ -35,12 +39,15 @@
  *      -petfinder_controller.settings("type","Dog");
  *      -petfinder_controller.settings("coat", "Long");
  *      -petfinder_controller.settings("size","Extra Large");
- * 3. find_pet()
- * 4. returnAnimalAttributes (type)
+ * 3. find_pet();
+ * 4. returnAnimalAttributes (type);
  *      -petfinder_controller.returnAnimalAttributes("Rabbit");
- * 5. returnAnimalAttributesObject (type)
+ * 5. returnAnimalAttributesObject (type);
  *      -petfinder_controller.returnAnimalAttributesObject("Rabbit");
- * 6. returnAvailableLimits()
+ * 6. returnAvailableLimits();
+ * 7. returnAvailableStates();
+ * 8. searchOrganization(state);
+ *      -searchOrganization("IL");
  * 
  */
 
@@ -71,6 +78,20 @@ var types_arr = [];
 var attribute_arr = [];
 var find_pet_response;
 var animal_attributes_obj;
+var find_organizations_result;
+
+var availableStates = [
+    'AL', 'AK', 'AZ', 'AR', 'CA',
+    'CO', 'CT', 'DE', 'FL', 'GA',
+    'HI', 'ID', 'IL', 'IN', 'IA',
+    'KS', 'KY', 'LA', 'ME', 'MD',
+    'MA', 'MI', 'MN', 'MS', 'MO',
+    'MT', 'NE', 'NV', 'NH', 'NJ',
+    'NM', 'NY', 'NC', 'ND', 'OH',
+    'OK', 'OR', 'PA', 'RI', 'SC',
+    'SD', 'TN', 'TX', 'UT', 'VT',
+    'VA', 'WA', 'WV', 'WI', 'WY',
+];
 
 //Set up the specificication of the attribute (spec) with the value
 var settings = function (spec, value) {
@@ -150,6 +171,21 @@ var returnAvailableLimits = async function(){
     return limit_arr;
 }
 
+//Returns the available states(in US, abbreivated) as an array
+var returnAvailableStates = async function(){
+    return availableStates;
+}
+
+// Returns the existing animal shelter organization in the state in US
+var searchOrganization = async function(state){
+    await client.organization.search({state: state})
+    .then(resp => {
+        // Do something with resp.data.organizations
+        find_organizations_result = resp.data.organizations;
+        console.log(find_organizations_result);
+    });
+}
+
 
 var petfinder_controller = {
     returnAnimalType: async function(){
@@ -173,6 +209,13 @@ var petfinder_controller = {
     },
     returnAvailableLimits: async function(){
         return returnAvailableLimits();
+    },
+    returnAvailableStates: async function(){
+        return returnAvailableStates();
+    },
+    searchOrganization: async function(state){
+        await searchOrganization(state);
+        return find_organizations_result;
     }
 
 }

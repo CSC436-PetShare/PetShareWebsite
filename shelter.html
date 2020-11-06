@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+    	<title>Adoption</title>
+    	<link rel="stylesheet" type="text/css" href="style.css" />
+    	<script type="module" src="scripts/shelter.js"></script>
+    	<script type="module" src="scripts/petfinder.js"></script>
+    	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    	<script src="https://unpkg.com/@petfinder/petfinder-js/dist/petfinder.min.js"></script>
+  </head>
+
+	<body>
+        <div id='header'>
+            <img src='Media/pawprint.jpg'>
+            <h1 id='title'>PetShare</h1>
+        </div>
+
+        <ul class='navigation'>
+           <li><a id='home' href='home.html'>Home</a></li>
+           <li><a id='adopt' href='adopt.html'>Adoption</a></li>
+           <li><a id='shelter' href='shelter.html' class='active'>Shelter</a></li>
+           <li><a id='profile' href='profile.html'>Profile</a></li>
+           <li><a id='settings' href='settings.html'>Settings</a></li>
+        </ul>
+    <label>Choose a location (city, state abbrev.):</label>
+    <select name="location" id="location"></select>
+  </body>
+        
+	
+</html>

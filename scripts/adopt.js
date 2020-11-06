@@ -6,7 +6,7 @@ import {petfinder_controller} from './petfinder.js';
 var animals;
 var limits;
 var attributes;
-
+var locations;
 
 /*
 	setDropdown creates a select element in the HTML
@@ -56,7 +56,7 @@ var submitButtonHandler = function(location,limit){
 
 	});
 	
-	if(location.trim().length>0){
+	if(location!==undefined){
 		petfinder_controller.settings('location', location);
 	}
 
@@ -72,7 +72,6 @@ var submitButtonHandler = function(location,limit){
 }
 
 window.addEventListener('DOMContentLoaded', function() {
-
 	var animalDropdown = document.getElementById('animals');
 	animalDropdown.required = true;
 	animalDropdown.id = "name";
@@ -87,15 +86,20 @@ window.addEventListener('DOMContentLoaded', function() {
 		limits = arr;
 		setDropdown(limitDropdown, limits);
 	})
+
+	var locationDropdown = document.getElementById('location');
+	petfinder_controller.returnAvailableStates().then(arr=>{
+		locations = arr;
+		setDropdown(locationDropdown, locations);
+	})
 	
 
 	var attributesView = document.getElementById('attributesView');
-	var locationInput = document.getElementById('location');
 	var submitButton = document.getElementById('submitButton');
 
 	//Sets the proper location when the textfield is changed
 	var locationValue = "";
-	locationInput.addEventListener("change", function(){
+	locationDropdown.addEventListener("change", function(){
 		locationValue = this.value;
 	});
 	var limitValue;
@@ -104,6 +108,7 @@ window.addEventListener('DOMContentLoaded', function() {
 	});
 
 	animalDropdown.addEventListener("change", function() {
+		
 		while (attributesView.firstChild) {
 		attributesView.removeChild(attributesView.firstChild);
 		}
