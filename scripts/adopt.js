@@ -4,6 +4,7 @@ import {petfinder_controller} from './petfinder.js';
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ++++++++++++++++++++++ testing arrays ++++++++++++++++++++++
 var animals;
+var limits;
 var attributes;
 
 
@@ -35,19 +36,37 @@ var setDropdown = function(dropdownEle, array){
 
 }
 
-var submitButtonHandler = function(location){
+var submitButtonHandler = function(location,limit){
+	if(attributes==null){
+		return;
+	}
+
 	attributes.forEach(function(attr){
+		//todo
 		var select_attribute = document.getElementById(attr);
 		if(attr === 'name'){
-			petfinder_controller.settings('type',select_attribute.value);
+			if(select_attribute.value !== 'unselected'){
+				petfinder_controller.settings('type',select_attribute.value);
+			}
 		}else{
-			petfinder_controller.settings(attr,select_attribute.value);
+			if(select_attribute.value !== 'unselected'){
+				petfinder_controller.settings(attr,select_attribute.value);
+			}
 		}
+
 	});
-	petfinder_controller.settings('location', location);
+	
+	if(location.trim().length>0){
+		petfinder_controller.settings('location', location);
+	}
+
+	if(limit!==undefined){
+		petfinder_controller.settings('limit',limit);
+	}
+	
 	petfinder_controller.find_pet().then(obj=>{
 		var animal_obj = obj['animals'];
-		alert(animal_obj);
+		console.log(animal_obj);
 	});
 
 }
@@ -63,6 +82,13 @@ window.addEventListener('DOMContentLoaded', function() {
 		setDropdown(animalDropdown, animals);
 	});
 
+	var limitDropdown = document.getElementById('limit');
+	petfinder_controller.returnAvailableLimits().then(arr=>{
+		limits = arr;
+		setDropdown(limitDropdown, limits);
+	})
+	
+
 	var attributesView = document.getElementById('attributesView');
 	var locationInput = document.getElementById('location');
 	var submitButton = document.getElementById('submitButton');
@@ -71,6 +97,10 @@ window.addEventListener('DOMContentLoaded', function() {
 	var locationValue = "";
 	locationInput.addEventListener("change", function(){
 		locationValue = this.value;
+	});
+	var limitValue;
+	limitDropdown.addEventListener("change", function(){
+		limitValue = this.value;
 	});
 
 	animalDropdown.addEventListener("change", function() {
@@ -120,5 +150,5 @@ window.addEventListener('DOMContentLoaded', function() {
 		});
 
 	});
-	submitButton.addEventListener("click", function() {submitButtonHandler(locationValue);});
+	submitButton.addEventListener("click", function() {submitButtonHandler(locationValue,limitValue);});
 });
