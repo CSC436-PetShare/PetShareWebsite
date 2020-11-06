@@ -100,11 +100,12 @@ var v_ResultView = function(dataArray, elmId) {
 			var size = document.createElement('label');
 			var age = document.createElement('label');
 			var sex = document.createElement('label');
-			var image = document.createElement('label');
+			var image = document.createElement('img');
 			var status = document.createElement('label');
 			var description = document.createElement('p');
 			var link = document.createElement('a');
 			
+			// ---------- set attributes ----------
 			name.setAttribute('class', 'adoptionLabel');
 			breed.setAttribute('class', 'adoptionLabel');
 			size.setAttribute('class', 'adoptionLabel');
@@ -114,6 +115,12 @@ var v_ResultView = function(dataArray, elmId) {
 			status.setAttribute('class', 'adoptionLabel');
 			description.setAttribute('class', 'adoptionLabel');
 			link.setAttribute('class', 'adoptionLabel');
+
+			row1_nameRow.setAttribute('class', 'nameRow');
+			row2_fieldRow.setAttribute('class', 'fieldRow');
+			row3_imageContainerRow.setAttribute('class', 'imageContainerRow');
+			row4_descriptionRow.setAttribute('class', 'descriptionRow');
+			row5_linkRow.setAttribute('class', 'linkRow');
 			
 			// ---------- Set elements ----------
 			name.innerHTML = list[i].getName();
@@ -121,7 +128,7 @@ var v_ResultView = function(dataArray, elmId) {
 			size.innerHTML = list[i].getSize();
 			age.innerHTML = list[i].getAge();
 			sex.innerHTML = list[i].getSex();
-			image.innerHTML = list[i].getImage();
+			image.src = list[i].getImage();
 			status.innerHTML = list[i].getStatus();
 			description.innerHTML = list[i].getDescription();
 			link.href = list[i].getLink();
@@ -160,17 +167,19 @@ var v_ResultView = function(dataArray, elmId) {
     }
 }
 
-var setModel = function(model, dataArray) {
+var setModel = function(dataArray) {
 	var modelArray = [];
 	for(var i = 0; i < dataArray.length; i++){
 		attributeCount = dataArray[i].length;
 		var post = m_AdoptionPost();
 		for(var j = 0; j < attributeCount; j++){
-			// init post
-			// post.construct();
+			/*  this is where we can create a adoption result with,
+				post.construct(<fill the params>); 
+			*/ 
 		}
 		modelArray.push(post);
 	}
+	return modelArray;
 }
 
 // This event will trigger after the content is
@@ -179,9 +188,9 @@ var setModel = function(model, dataArray) {
 window.addEventListener('DOMContentLoaded', function() {
 
 	var mockedArray = [];
-    var allResults = setModel(theModel, mockedArray);
+    var listModel = setModel(mockedArray);
 
-    var resultView = v_ResultView(allResults, 'resultView');
+    var resultView = v_ResultView(listModel, 'resultView');
     resultView.render();
 
 });
