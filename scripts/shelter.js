@@ -41,6 +41,7 @@ window.addEventListener('DOMContentLoaded', function() {
     var view = document.getElementById('shelterView');
 	locationDropdown.addEventListener("change", function(){
         locationValue = this.value;
+        view.innerHTML = "";
         petfinder_controller.searchOrganization(locationValue).then(
             organizations =>{
                 organizations.forEach(function(element){
