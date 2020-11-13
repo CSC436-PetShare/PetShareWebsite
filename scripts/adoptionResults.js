@@ -184,13 +184,18 @@ var initAdoptionResults = function(dataArray) {
 	// init the model
 	for(var i = 0; i < dataArray.length; i++){
 		var post = m_AdoptionPost();
+
+		var photo_url = null;
+		if(dataArray[i].primary_photo_cropped!=null){
+			photo_url = dataArray[i].primary_photo_cropped.small;
+		}
 		post.construct(
 			dataArray[i].name,
 			dataArray[i].breeds[0],
 			dataArray[i].size,
 			dataArray[i].age,
 			dataArray[i].gender,
-			dataArray[i].primary_photo_cropped.small,
+			photo_url,
 			dataArray[i].status,
 			dataArray[i].description,
 			dataArray[i]._links[0]
@@ -201,3 +206,6 @@ var initAdoptionResults = function(dataArray) {
 	// update view
 	v_ResultView(modelArray, 'resultView').render();
 }
+
+
+export {initAdoptionResults};

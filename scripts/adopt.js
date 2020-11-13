@@ -1,4 +1,5 @@
 import {petfinder_controller} from './petfinder.js';
+import {initAdoptionResults} from './adoptionResults.js';
 
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -72,6 +73,7 @@ var submitButtonHandler = function(location,limit){
 				return parseFloat(a.distance) - parseFloat(b.distance);
 			});
 			console.log(animal_obj);
+			initAdoptionResults(animal_obj);
 
 		}
 
