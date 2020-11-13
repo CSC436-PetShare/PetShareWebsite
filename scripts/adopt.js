@@ -35,8 +35,7 @@ var setDropdown = function(dropdownEle, array){
 
 }
 
-var submitButtonHandler = function(){
-	console.log("Submit button clicked");
+var submitButtonHandler = function(location){
 	attributes.forEach(function(attr){
 		var select_attribute = document.getElementById(attr);
 		if(attr === 'name'){
@@ -45,6 +44,7 @@ var submitButtonHandler = function(){
 			petfinder_controller.settings(attr,select_attribute.value);
 		}
 	});
+	petfinder_controller.settings('location', location);
 	petfinder_controller.find_pet().then(obj=>{
 		var animal_obj = obj['animals'];
 		alert(animal_obj);
@@ -64,7 +64,14 @@ window.addEventListener('DOMContentLoaded', function() {
 	});
 
 	var attributesView = document.getElementById('attributesView');
+	var locationInput = document.getElementById('location');
 	var submitButton = document.getElementById('submitButton');
+
+	//Sets the proper location when the textfield is changed
+	var locationValue = "";
+	locationInput.addEventListener("change", function(){
+		locationValue = this.value;
+	});
 
 	animalDropdown.addEventListener("change", function() {
 		while (attributesView.firstChild) {
@@ -113,5 +120,5 @@ window.addEventListener('DOMContentLoaded', function() {
 		});
 
 	});
-	submitButton.addEventListener("click", submitButtonHandler);
+	submitButton.addEventListener("click", function() {submitButtonHandler(locationValue);});
 });

@@ -42,10 +42,18 @@ function signUpWithEmailAndPassword(){
     var password = document.getElementById("password").value;
 
     // const promise = auth.createUserWithEmailAndPassword(email.value,password.value);
-    auth.createUserWithEmailAndPassword(email, password)
-    .then(function(){
-        sendVerifyEmail();
-        signOut();
+    if(user.includes(" ")) {
+    	 alert("User name cannot have spaces");
+    	 return;
+    }
+    await auth.createUserWithEmailAndPassword(email, password)
+    .then(function(result){
+    	var _user = "" + user;
+        console.log(_user);
+        result.user.updateProfile({
+            displayName: _user 
+        });
+        result.user.sendVerifyEmail();
     })
     .catch(function(error) {
         // Handle Errors here.

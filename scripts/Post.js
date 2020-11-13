@@ -13,6 +13,7 @@ var db = fb.database();
 var storage = fb.storage();
 var auth = fb.auth();
 
+
 /*
 object acting function: makeSignaller
 param: none
@@ -68,15 +69,35 @@ var m_PostModel =  function() {
 					upvotes: 0,
 					user: auth.currentUser.uid
 				});
+
+				//Adds the post ot the users post list as well for profile information
+				var userPostList;
+				await db.ref('userPosts/' + auth.currentUser.uid).once('value').then(function(snapshot){
+					userPostList = snapshot.val();
+				});
+				if(!userPostList) {
+					userPostList = [];
+					userPostList.push(newPostKey);
+					await db.ref('userPosts/' + auth.currentUser.uid).set({
+						postList: userPostList
+					});
 			
+				}
+				else {
+					userPostList = Object.values(userPostList);
+					userPostList = userPostList[0];
+					userPostList.push(newPostKey);
+					await db.ref('userPosts/' + auth.currentUser.uid).update({
+						postList: userPostList
+					});
+				}
 			}
 			_observers.notify();
 		},
 
 		getData: async function() {
 			//Read all the posts from the database
-			//return new Promise(async (resolve, reject) => {
-			var newList = []
+			var newList = [];
     		var query = db.ref('posts');
     		await query.once("value").then(function(snapshot) {
     			snapshot.forEach(function(childSnapshot) {
@@ -90,14 +111,14 @@ var m_PostModel =  function() {
       			index 4 = user*/
       		
       		
-      			var childData = []
+      			var childData = [];
       			childData.push(childSnapshot.child("title").val());
       			childData.push(childSnapshot.child("image").val());
       			childData.push(childSnapshot.child("comments").val());
       			childData.push(childSnapshot.child("upvotes").val());
       			childData.push(childSnapshot.child("user").val());
 
-      			newList.push(childData);
+    			newList.push(childData);
   				});
 			}).then(() => {_postList = newList});
 		},
@@ -149,6 +170,7 @@ var v_PostsView = function(model, controller, elmId) {
 		while (_elm.firstChild) {
 		    _elm.removeChild(_elm.firstChild);
 		}
+		
 		// update view
 		for(var i = 0; i < list.length; i++){
 			var post = document.createElement('div'); // Create new div
@@ -169,6 +191,35 @@ var v_PostsView = function(model, controller, elmId) {
 			post.append(user);
 			post.append(title);
 			post.append(img);
+			post.append(adoreButton);
+			post.append(adoredLabel)
+			post.append(commentsLabel);
+			post.append(newComment);
+			if(list[i][2] != null){
+				//Create comments
+				var comments = v_createComments(list[i][2]);
+				post.append(comments);
+			}
+
+			//If the currentUser owns the post then add a delete button
+			var userId = list[i][5];
+			if(userId === auth.currentUser.uid){
+				var removeButton = document.createElement('input');
+				removeButton.type = "button";
+				removeButton.value = "Remove"
+				var currentImage = list[i][1];
+				removeButton.setAttribute("class", list[i][7])
+				removeButton.addEventListener('click', function() {
+					var currentPost = this.getAttribute("class");
+					_observers.notify({
+		   				type: globals.signals.remove,
+		    			image: currentImage,
+		    			post: "posts/" + currentPost
+					})
+    			});
+    			post.append(removeButton);
+			}
+
 		    _elm.append(post); // Add child to the parent element
 		}
     }
