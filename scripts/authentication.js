@@ -37,7 +37,7 @@ auth.onAuthStateChanged(function(user) {
 
 
 // Sign up with email & address
-function signUpWithEmailAndPassword(){
+async function signUpWithEmailAndPassword(){
     var email = document.getElementById("email").value;
     var password = document.getElementById("password").value;
 
