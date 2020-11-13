@@ -102,12 +102,14 @@ footer {
 #createPost {
     font-family: Roboto-Thin;
     text-align: center;
+    box-shadow: 2px 2px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 10px 10px 10px 10px;
     margin-top: 50px;
-    margin-right: 50px;
+    margin-right: 20px;
     margin-left: 10px;
     float: right;
     width: 300px;
-    border: 3px solid #C4C4C4;
+    padding-bottom: 20px;
 }
 
 h3 {
@@ -130,4 +132,31 @@ h3 {
     height: 30px;
     margin-bottom: 20px;
     margin-top: 20px;
+}
+
+label {
+    margin: 20px 5px 20px 20px;
+    font-family: Roboto-Thin;
+    font-size: 14pt;
+    width: 30%;
+    text-align: right;
+}
+
+input {
+    border-radius: 0px;
+    border: 1px solid #C4C4C4;
+    height: 20px;
+    margin-top: 20px;
+}
+
+select {
+    border-radius: 0px;
+    border: 1px solid #C4C4C4;
+    height: 25px;
+    margin-top: 20px;
+}
+
+.choices {
+    margin-top: 20px;
+    text-align: center;
 }
