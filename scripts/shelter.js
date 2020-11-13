@@ -54,7 +54,7 @@ var _render = function(search_result){
 	row.appendChild(t_name_data);
 }
 
-
+//Initialize the table
 var set_up_table = function(){
 	var view = document.getElementById('shelterView');
 	view.innerHTML = "";
