@@ -1,10 +1,12 @@
 /*
 	Usage: This javascript is used with Post.html to create a MVC structure
 	Naming: m_ before a name means it is for the model
+			g_ before a name means it is a global
 			v_ before a name means it is for the view
 			c_ before a name means it is for the controller
 			_ before a name means it is a private field to the object
 */
+var g_AdoptionPost_listModel = [];
 
 var m_AdoptionPost = function() {
     var _name = "";
@@ -170,16 +172,23 @@ var v_ResultView = function(dataArray, elmId) {
 var setModel = function(dataArray) {
 	var modelArray = [];
 	for(var i = 0; i < dataArray.length; i++){
-		attributeCount = dataArray[i].length;
 		var post = m_AdoptionPost();
-		for(var j = 0; j < attributeCount; j++){
-			/*  this is where we can create a adoption result with,
-				post.construct(<fill the params>); 
-			*/ 
-		}
+
+		post.construct(
+			dataArray[i].name,
+			dataArray[i].breeds[0],
+			dataArray[i].size,
+			dataArray[i].age,
+			dataArray[i].gender,
+			dataArray[i].primary_photo_cropped[0],
+			dataArray[i].status,
+			dataArray[i].description,
+			dataArray[i]._links[0]
+			); 
+
 		modelArray.push(post);
 	}
-	return modelArray;
+	g_AdoptionPost_listModel = modelArray;
 }
 
 // This event will trigger after the content is
@@ -187,10 +196,7 @@ var setModel = function(dataArray) {
 // Here is where we will create the object and wire them
 window.addEventListener('DOMContentLoaded', function() {
 
-	var mockedArray = [];
-    var listModel = setModel(mockedArray);
-
-    var resultView = v_ResultView(listModel, 'resultView');
+    var resultView = v_ResultView(g_AdoptionPost_listModel, 'resultView');
     resultView.render();
 
 });
