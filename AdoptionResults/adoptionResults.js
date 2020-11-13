@@ -6,7 +6,6 @@
 			c_ before a name means it is for the controller
 			_ before a name means it is a private field to the object
 */
-var g_AdoptionPost_listModel = [];
 
 var m_AdoptionPost = function() {
     var _name = "";
@@ -169,11 +168,22 @@ var v_ResultView = function(dataArray, elmId) {
     }
 }
 
-var setModel = function(dataArray) {
+/*
+use: 
+	this function should be called in the submitButtonHandler in adopt.js
+
+description: 
+	initializes the model by creating a list of adoption results,
+	then updates the view
+
+view: the view is intended to be located in a div with id='resultView'
+*/
+var initAdoptionResults = function(dataArray) {
 	var modelArray = [];
+
+	// init the model
 	for(var i = 0; i < dataArray.length; i++){
 		var post = m_AdoptionPost();
-
 		post.construct(
 			dataArray[i].name,
 			dataArray[i].breeds[0],
@@ -185,18 +195,9 @@ var setModel = function(dataArray) {
 			dataArray[i].description,
 			dataArray[i]._links[0]
 			); 
-
 		modelArray.push(post);
 	}
-	g_AdoptionPost_listModel = modelArray;
+
+	// update view
+	v_ResultView(modelArray, 'resultView').render();
 }
-
-// This event will trigger after the content is
-// loaded so I will be sure all the HTML content exists
-// Here is where we will create the object and wire them
-window.addEventListener('DOMContentLoaded', function() {
-
-    var resultView = v_ResultView(g_AdoptionPost_listModel, 'resultView');
-    resultView.render();
-
-});
