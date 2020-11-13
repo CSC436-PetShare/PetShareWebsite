@@ -68,6 +68,11 @@ var submitButtonHandler = function(location,limit){
 		if(obj!=null){
 			var animal_obj = obj['animals'];
 			console.log(animal_obj);
+			animal_obj.sort(function(a, b) {
+				return parseFloat(a.distance) - parseFloat(b.distance);
+			});
+			console.log(animal_obj);
+
 		}
 
 	});
@@ -101,7 +106,7 @@ window.addEventListener('DOMContentLoaded', function() {
 	locationInput.addEventListener("change", function(){
 		locationValue = this.value;
 	});
-	
+
 	var limitValue;
 	limitDropdown.addEventListener("change", function(){
 		limitValue = this.value;

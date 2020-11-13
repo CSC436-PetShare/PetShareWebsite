@@ -71,6 +71,7 @@ const client = new petfinder.Client({
 var pet_spec = {
     limit: 5,
     //MAX LIMIT: 50
+    distance: 500,
 }
 
 var animal_attributes;
