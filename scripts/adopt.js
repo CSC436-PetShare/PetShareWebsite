@@ -10,7 +10,7 @@ var locations;
 
 /*
 	setDropdown creates a select element in the HTML
-	and the select is populated with option HTML elements
+	and the select is populated with option HTML elementslocation
 	made from the array param
 */ 
 var setDropdown = function(dropdownEle, array){
@@ -56,7 +56,7 @@ var submitButtonHandler = function(location,limit){
 
 	});
 	
-	if(location!==undefined){
+	if(location.length>0){
 		petfinder_controller.settings('location', location);
 	}
 
@@ -65,8 +65,11 @@ var submitButtonHandler = function(location,limit){
 	}
 	
 	petfinder_controller.find_pet().then(obj=>{
-		var animal_obj = obj['animals'];
-		console.log(animal_obj);
+		if(obj!=null){
+			var animal_obj = obj['animals'];
+			console.log(animal_obj);
+		}
+
 	});
 
 }
@@ -85,23 +88,20 @@ window.addEventListener('DOMContentLoaded', function() {
 	petfinder_controller.returnAvailableLimits().then(arr=>{
 		limits = arr;
 		setDropdown(limitDropdown, limits);
-	})
-
-	var locationDropdown = document.getElementById('location');
-	petfinder_controller.returnAvailableStates().then(arr=>{
-		locations = arr;
-		setDropdown(locationDropdown, locations);
-	})
+	});
 	
 
 	var attributesView = document.getElementById('attributesView');
+	var locationInput = document.getElementById('location');
 	var submitButton = document.getElementById('submitButton');
 
 	//Sets the proper location when the textfield is changed
+	//Sets the proper location when the textfield is changed
 	var locationValue = "";
-	locationDropdown.addEventListener("change", function(){
+	locationInput.addEventListener("change", function(){
 		locationValue = this.value;
 	});
+	
 	var limitValue;
 	limitDropdown.addEventListener("change", function(){
 		limitValue = this.value;
