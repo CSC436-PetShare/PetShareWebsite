@@ -4,7 +4,7 @@
 
 <html>
     <head>
-        <title>Sign Up</title>
+        <title>Register</title>
         <link rel="stylesheet" type="text/css" href="loginStyle.css" />
         <!-- The core Firebase JS SDK is always required and must be listed first -->
         <script src="https://www.gstatic.com/firebasejs/7.22.0/firebase-app.js"></script>
@@ -18,11 +18,13 @@
         <form id="formContainer" method="post">
             <label>Email:</label>
             <input type="email" id="email"/><br>
+            <label>Username:</label>
+            <input type="text" id="username"/><br>
             <label>Password:</label>
             <input type="password" id="password"/><br>
+            
 
-            <input type="button"  onclick="signUpWithEmailAndPassword()" value="Sign Up"
-            class="button"><br>
+            <input type="button" value="Sign Up " class="button" id="signUpButn"><br>
             
             <a href="index.html" onClick="">Sign In</a>
         </form>

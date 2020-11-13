@@ -2,9 +2,13 @@
 <html>
 
 	<head>
-        <title>Adoption</title>
-        <link rel="stylesheet" type="text/css" href="style.css" />
-   	</head>
+    	<title>Adoption</title>
+    	<link rel="stylesheet" type="text/css" href="style.css" />
+    	<script type="module" src="scripts/adopt.js"></script>
+    	<script type="module" src="scripts/petfinder.js"></script>
+    	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    	<script src="https://unpkg.com/@petfinder/petfinder-js/dist/petfinder.min.js"></script>
+  </head>
 
 	<body>
         <div id='header'>
@@ -18,7 +22,13 @@
            <li><a id='profile' href='profile.html'>Profile</a></li>
            <li><a id='settings' href='settings.html'>Settings</a></li>
         </ul>
+		<label>Choose a animal:</label>
+		<select name="animals" id="animals"></select>
 
-	</body>
+		<!-- starts off hidden, until animal is chosen -->
+		<div id="attributesView"></div>
+		<input type="button" value="Submit" id="submitButton">
+  </body>
+        
 	
 </html>

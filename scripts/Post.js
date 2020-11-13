@@ -53,14 +53,17 @@ var m_PostModel =  function() {
 
 		submitPost: async function(title, image) {
 			if(image != null && title != "") {
-				//upload file
-				//TODO: remove spaces from image name
-				await storage.ref("images/" + image.name).put(image);
 				// Get a key for a new Post.
   				var newPostKey = db.ref().child('posts').push().key;
+  				//upload file
+				//TODO: remove spaces from image name
+				var imageName = newPostKey + image.name;
+				var blob = image.slice(0, image.size, 'image/png'); 
+				var newFile = new File([blob], imageName + '.png', {type: 'image/png'});
+				await storage.ref("images/" + imageName).put(newFile);
 				await db.ref('posts/' + newPostKey).set({
-					comments: "",
-					image: image.name,
+					comments: {},
+					image: imageName,
 					title: title,
 					upvotes: 0,
 					user: auth.currentUser.uid
