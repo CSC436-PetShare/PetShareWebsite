@@ -190,7 +190,7 @@ var initAdoptionResults = function(dataArray) {
 			dataArray[i].size,
 			dataArray[i].age,
 			dataArray[i].gender,
-			dataArray[i].primary_photo_cropped[0],
+			dataArray[i].primary_photo_cropped.small,
 			dataArray[i].status,
 			dataArray[i].description,
 			dataArray[i]._links[0]
