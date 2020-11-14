@@ -16,6 +16,7 @@ var db = fb.database();
 var storage = fb.storage();
 var auth = fb.auth();
 
+
 /*
 object acting function: makeSignaller
 param: none
@@ -56,30 +57,52 @@ var m_PostModel =  function() {
 
 		submitPost: async function(title, image) {
 			if(image != null && title != "") {
-				//upload file
-				//TODO: remove spaces from image name
-				await storage.ref("images/" + image.name).put(image);
 				// Get a key for a new Post.
-				console.log(auth.currentUser.displayName);
   				var newPostKey = db.ref().child('posts').push().key;
+  				//upload file
+				//TODO: remove spaces from image name
+				var imageName = newPostKey + image.name;
+				var blob = image.slice(0, image.size, 'image/png'); 
+				var newFile = new File([blob], imageName + '.png', {type: 'image/png'});
+				await storage.ref("images/" + imageName).put(newFile);
 				await db.ref('posts/' + newPostKey).set({
 					comments: {},
-					image: image.name,
+					image: imageName,
 					title: title,
 					adoreCount: 0,
 					adores: {},
 					uid: auth.currentUser.uid,
 					name: auth.currentUser.displayName
 				});
+
+				//Adds the post ot the users post list as well for profile information
+				var userPostList;
+				await db.ref('userPosts/' + auth.currentUser.uid).once('value').then(function(snapshot){
+					userPostList = snapshot.val();
+				});
+				if(!userPostList) {
+					userPostList = [];
+					userPostList.push(newPostKey);
+					await db.ref('userPosts/' + auth.currentUser.uid).set({
+						postList: userPostList
+					});
 			
+				}
+				else {
+					userPostList = Object.values(userPostList);
+					userPostList = userPostList[0];
+					userPostList.push(newPostKey);
+					await db.ref('userPosts/' + auth.currentUser.uid).update({
+						postList: userPostList
+					});
+				}
 			}
 			_observers.notify();
 		},
 
 		getData: async function() {
 			//Read all the posts from the database
-			//return new Promise(async (resolve, reject) => {
-			var newList = []
+			var newList = [];
     		var query = db.ref('posts');
     		await query.once("value").then(function(snapshot) {
     			snapshot.forEach(function(childSnapshot) {
@@ -98,7 +121,7 @@ var m_PostModel =  function() {
       			*/
       		
       		
-      			var childData = []
+      			var childData = [];
       			childData.push(childSnapshot.child("title").val());
       			childData.push(childSnapshot.child("image").val());
       			childData.push(childSnapshot.child("comments").val());
@@ -108,7 +131,7 @@ var m_PostModel =  function() {
       			childData.push(childSnapshot.child("name").val());
       			childData.push(key);
 
-      			newList.push(childData);
+    			newList.push(childData);
   				});
 			}).then(() => {_postList = newList});
 		},
@@ -213,6 +236,7 @@ var v_PostsView = function(model, controller, elmId) {
 		while (_elm.firstChild) {
 		    _elm.removeChild(_elm.firstChild);
 		}
+		
 		// update view
 		for(var i = 0; i < list.length; i++){
 			var post = document.createElement('div'); // Create new div
@@ -298,7 +322,6 @@ var v_PostsView = function(model, controller, elmId) {
 				removeButton.setAttribute("class", list[i][7])
 				removeButton.addEventListener('click', function() {
 					var currentPost = this.getAttribute("class");
-				console.log(currentPost);
 					_observers.notify({
 		   				type: globals.signals.remove,
 		    			image: currentImage,
