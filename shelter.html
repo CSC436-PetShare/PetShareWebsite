@@ -4,8 +4,7 @@
 	<head>
     	<title>Adoption</title>
     	<link rel="stylesheet" type="text/css" href="style.css" />
-      <link rel="stylesheet" type="text/css" href="adoptionResults.css">
-    	<script type="module" src="scripts/adopt.js"></script>
+    	<script type="module" src="scripts/shelter.js"></script>
     	<script type="module" src="scripts/petfinder.js"></script>
     	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     	<script src="https://unpkg.com/@petfinder/petfinder-js/dist/petfinder.min.js"></script>
@@ -19,24 +18,14 @@
 
         <ul class='navigation'>
            <li><a id='home' href='home.html'>Home</a></li>
-           <li><a id='adopt' href='adopt.html' class='active'>Adoption</a></li>
-           <li><a id='shelter' href='shelter.html'>Shelter</a></li>
+           <li><a id='adopt' href='adopt.html'>Adoption</a></li>
+           <li><a id='shelter' href='shelter.html' class='active'>Shelter</a></li>
            <li><a id='profile' href='profile.html'>Profile</a></li>
            <li><a id='settings' href='settings.html'>Settings</a></li>
         </ul>
-    <label>Choose a location (postal code, city, state abbrev.):</label>
-    <input type="text" id="location"></input>
-    <br>
-    <label>Search limit</label>
-    <select name="limit" id="limit"></select>
-    <br>
-		<label>Choose a animal:</label>
-		<select name="animals" id="animals"></select>
-
-		<!-- starts off hidden, until animal is chosen -->
-		<div id="attributesView"></div>
-    <input type="button" value="Submit" id="submitButton">
-    <div id="resultView"></div>
+    <label>Choose a location (city, state abbrev.):</label>
+    <select name="location" id="location"></select>
+    <div id="shelterView"></div>
   </body>
         
 	
