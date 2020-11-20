@@ -80,6 +80,7 @@ async function signUpWithEmailAndPassword(email, password, user){
     await auth.createUserWithEmailAndPassword(email, password)
     .then(function(result){
     	var _user = "" + user;
+        console.log(_user);
         result.user.updateProfile({
             displayName: _user 
         });
