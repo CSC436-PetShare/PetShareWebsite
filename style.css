@@ -87,8 +87,23 @@ footer {
     width: 500px;
     word-wrap: break-word;
     text-align: center;
+    padding: 5px;
     margin-block-end: 25px;
 } 
+
+.post p {
+    margin: 5px;
+    margin-top: 10px;
+
+}
+
+.post input[type='button'][value='Submit Comment'] {
+    border: none;
+    background-color: #64A9DB;
+    width: 150px;
+    height: 24px;
+    margin: 0px 0px 10px 10px;
+}
 
 .post img {
     width: 400px;
