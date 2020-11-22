@@ -168,7 +168,7 @@ var returnAnimalAttributesObject = async function(type){
 
 //Returns the available search limit as an array
 var returnAvailableLimits = async function(){
-    var limit_arr = [5,10,15,20];
+    var limit_arr = [10,25,50,100];
     return limit_arr;
 }
 

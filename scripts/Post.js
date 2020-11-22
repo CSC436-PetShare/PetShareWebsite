@@ -67,7 +67,7 @@ var m_PostModel =  function() {
   				var newPostKey = db.ref().child('posts').push().key;
   				//upload file
 				//TODO: remove spaces from image name
-				var imageName = newPostKey + image.name;
+				var imageName = newPostKey + image.name.replaceAll(" ", "");
 				var blob = image.slice(0, image.size, 'image/png'); 
 				var newFile = new File([blob], imageName + '.png', {type: 'image/png'});
 				await storage.ref("images/" + imageName).put(newFile);
