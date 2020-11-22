@@ -1,6 +1,12 @@
 /*
-	Usage: This javascript is used with home.html to create a MVC structure
+	Usage: This javascript is used with home.html to create a MVC structure.
+	The features of this script include populating the home page with posts from users.
+	Allowing users to make a new post with a description, image, and title.
+	Allowing users to comment on each others posts and "adore" each other posts.
+	Allowing users to remove their own posts.
 */
+
+//Globals used for signals for events and the controller.
 var globals = {
     signals: {
 	post: 'POST',

@@ -1,8 +1,12 @@
 /*
 	Javascript to be used with the profile.html webpage.
 	Shows a list of posts from a specific user by retrieving
-	posts from the firebase database
+	posts from the firebase database. Much of the functinoailty 
+	of the posts are retained in this script. This populates the view 
+	of the profile page with posts made from the current authenticated user.
 */
+
+//Globals used for signals for events and the controller.
 var globals = {
     signals: {
 	comment: 'COMMENT',
@@ -12,9 +16,9 @@ var globals = {
 }
 import {fb} from './firebaseInit.js'
 
-var db = fb.database();
-var storage = fb.storage();
-var auth = fb.auth();
+var db = fb.database(); //db is the reference to our firebase database
+var storage = fb.storage();// storage is the reference to our firebase storage
+var auth = fb.auth();//auth is the reference to our firebase authentication
 
 /*
 object acting function: makeSignaller
@@ -120,9 +124,27 @@ var m_ProfileModel =  function() {
 			_observers.notify();
 		},
 		//Removes a post and its image
-		removePost: function(post, image) {
-			db.ref(post).remove();
-			storage.ref("images/" + image).delete();
+		removePost: async function(post, image) {
+			var image;
+			await db.ref(post).once('value').then(function(snapshot){
+				image = snapshot.child("image").val();
+			});
+
+			storage.ref("images/" + image).delete(); //Delete the image in the firebase storage
+			db.ref(post).remove(); //Remove post from posts in database
+
+			//Delete the refrence to the post in userPosts
+			var userPostList;
+			await db.ref('userPosts/' + auth.currentUser.uid).once('value').then(function(snapshot){
+				userPostList = snapshot.val();
+			});
+			userPostList = Object.values(userPostList);
+			userPostList = userPostList[0];
+			var indexToBeRemoved = userPostList.indexOf(post.substring(6)); //index of removed post reference
+			userPostList.splice(indexToBeRemoved, 1); //Remove the post reference from the array
+			await db.ref('userPosts/' + auth.currentUser.uid).update({
+				postList: userPostList
+			});
 			_observers.notify();
 		},
 		//Add or subtracts adores for a post based on if the user has already adored or not
@@ -284,13 +306,11 @@ var v_ProfileView = function(model, controller, elmId) {
 				var removeButton = document.createElement('input');
 				removeButton.type = "button";
 				removeButton.value = "Remove"
-				var currentImage = list[i][1];
 				removeButton.setAttribute("class", list[i][7])
 				removeButton.addEventListener('click', function() {
 					var currentPost = this.getAttribute("class");
 					_observers.notify({
 		   				type: globals.signals.remove,
-		    			image: currentImage,
 		    			post: "posts/" + currentPost
 					})
     			});

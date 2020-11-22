@@ -1,5 +1,6 @@
 /*
-	Usage: This javascript is to intitalize the firebase app and send an instance of it to other files.
+	Usage: This javascript is to intitalize the firebase app 
+	and send an instance of it to other files.
 */
 var config = {
     apiKey: "AIzaSyBq4vLcktzEWiKuyvAnDfSW6KivKVg6gag",
