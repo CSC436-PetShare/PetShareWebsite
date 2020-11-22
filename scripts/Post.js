@@ -1,6 +1,12 @@
 /*
-	Usage: This javascript is used with home.html to create a MVC structure
+	Usage: This javascript is used with home.html to create a MVC structure.
+	The features of this script include populating the home page with posts from users.
+	Allowing users to make a new post with a description, image, and title.
+	Allowing users to comment on each others posts and "adore" each other posts.
+	Allowing users to remove their own posts.
 */
+
+//Globals used for signals for events and the controller.
 var globals = {
     signals: {
 	post: 'POST',
@@ -39,7 +45,7 @@ var makeSignaller = function() {
     };
 }
 
-
+//Model to handle post information in both the webpage and firebase database
 var m_PostModel =  function() {
     var _observers = makeSignaller();  // To notify observers
  	var _postList = [];
@@ -54,7 +60,7 @@ var m_PostModel =  function() {
 		    // function
 		    _observers.add(handler);
 		},
-
+		//Submits a new post to the firebase database
 		submitPost: async function(title, image) {
 			if(image != null && title != "") {
 				// Get a key for a new Post.
@@ -99,7 +105,7 @@ var m_PostModel =  function() {
 			}
 			_observers.notify();
 		},
-
+		//Gets post data from the firebase database
 		getData: async function() {
 			//Read all the posts from the database
 			var newList = [];
@@ -153,9 +159,28 @@ var m_PostModel =  function() {
 			_observers.notify();
 		},
 		//Removes a post and its image
-		removePost: function(post, image) {
-			db.ref(post).remove();
-			storage.ref("images/" + image).delete();
+		removePost: async function(post, image) {
+
+			var image;
+			await db.ref(post).once('value').then(function(snapshot){
+				image = snapshot.child("image").val();
+			});
+
+			storage.ref("images/" + image).delete(); //Delete the image in the firebase storage
+			db.ref(post).remove(); //Remove post from posts in database
+
+			//Delete the refrence to the post in userPosts
+			var userPostList;
+			await db.ref('userPosts/' + auth.currentUser.uid).once('value').then(function(snapshot){
+				userPostList = snapshot.val();
+			});
+			userPostList = Object.values(userPostList);
+			userPostList = userPostList[0];
+			var indexToBeRemoved = userPostList.indexOf(post.substring(6)); //index of removed post reference
+			userPostList.splice(indexToBeRemoved, 1); //Remove the post reference from the array
+			await db.ref('userPosts/' + auth.currentUser.uid).update({
+				postList: userPostList
+			});
 			_observers.notify();
 		},
 		//Add or subtracts adores for a post based on if the user has already adored or not
@@ -312,19 +337,17 @@ var v_PostsView = function(model, controller, elmId) {
 				post.append(comments);
 			}
 
-			//If the currentUser owns the post then add a delete button
+			//If the currentUser owns the post then add a remove button
 			var userId = list[i][5];
 			if(userId === auth.currentUser.uid){
 				var removeButton = document.createElement('input');
 				removeButton.type = "button";
 				removeButton.value = "Remove"
-				var currentImage = list[i][1];
 				removeButton.setAttribute("class", list[i][7])
 				removeButton.addEventListener('click', function() {
 					var currentPost = this.getAttribute("class");
 					_observers.notify({
 		   				type: globals.signals.remove,
-		    			image: currentImage,
 		    			post: "posts/" + currentPost
 					})
     			});
@@ -348,6 +371,8 @@ var v_PostsView = function(model, controller, elmId) {
     }
 }
 
+//Creates a button that has an event listener to create an event with information about a post
+//to be created
 var v_submitPostButton = function(model, btn, textfield, imageField){
 	var _model = model;
     var _btn = btn; // get the DOM node associated with the button
@@ -379,6 +404,8 @@ var v_submitPostButton = function(model, btn, textfield, imageField){
     }
 }
 
+//Places all comments from the list parameter comments into divs and 
+//returns an element containing them all
 var v_createComments = function(comments) {
 	if(comments === null){
 		return;
@@ -424,7 +451,7 @@ var c_Controller = function(model) {
 		    _model.toggleAdore(evt.postRef, evt.uid);
 		    break;
 		case (globals.signals.remove):
-		    _model.removePost(evt.post, evt.image);
+		    _model.removePost(evt.post);
 		    break;
 		default: // Unrecognized event or event not given
 		    console.log('Uncrecognized event:', evt.type); // Print what the bad value is
