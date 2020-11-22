@@ -124,7 +124,7 @@ var m_ProfileModel =  function() {
 			_observers.notify();
 		},
 		//Removes a post and its image
-		removePost: function(post, image) {
+		removePost: async function(post, image) {
 			var image;
 			await db.ref(post).once('value').then(function(snapshot){
 				image = snapshot.child("image").val();
