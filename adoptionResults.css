@@ -1,4 +1,22 @@
-.adoptionLabel {
+.adoptionpost {
 	border: 5px solid black;
 	margin: 2px;
+	margin-bottom: 15px;
+}
+
+.adoptionLabel {
+	border: 1px solid black;
+	margin: 2px;
+}
+
+.adoptionPicture {
+    width: 130px;
+    height: 100px;
+    background-color: transparent;
+}
+
+img {
+    width: 130px;
+    height: 100px;
+    background-color: transparent;
 }

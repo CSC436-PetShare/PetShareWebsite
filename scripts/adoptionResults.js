@@ -16,11 +16,13 @@ var m_AdoptionPost = function() {
     var _image = "";
     var _status = "";
     var _description = "";
+    var _email = "";
+    var _phone = "";
     var _link = "";
 
     return {
 
-		construct: function(name, breed, size, age, sex, image, status, description, link) {
+		construct: function(name, breed, size, age, sex, image, status, description, email, phone, link) {
 			_name = name;
 			_breed = breed;
 			_size = size;
@@ -29,6 +31,8 @@ var m_AdoptionPost = function() {
 			_image = image;
 			_status = status;
 			_description = description;
+			_email = email;
+			_phone = phone;
 			_link = link;
 		},
 
@@ -62,6 +66,14 @@ var m_AdoptionPost = function() {
 
 		getDescription: function() {
 			return _description;
+		},
+
+		getEmail: function() {
+			return _email;
+		},
+
+		getPhone: function() {
+			return _phone;
 		},
 
 		getLink: function() {
@@ -104,6 +116,8 @@ var v_ResultView = function(dataArray, elmId) {
 			var image = document.createElement('img');
 			var status = document.createElement('label');
 			var description = document.createElement('p');
+			var email = document.createElement('p');
+			var phone = document.createElement('p');
 			var link = document.createElement('a');
 			
 			// ---------- set attributes ----------
@@ -112,9 +126,11 @@ var v_ResultView = function(dataArray, elmId) {
 			size.setAttribute('class', 'adoptionLabel');
 			age.setAttribute('class', 'adoptionLabel');
 			sex.setAttribute('class', 'adoptionLabel');
-			image.setAttribute('class', 'adoptionLabel');
+			image.setAttribute('class', 'adoptionPicture');
 			status.setAttribute('class', 'adoptionLabel');
 			description.setAttribute('class', 'adoptionLabel');
+			email.setAttribute('class', 'adoptionLabel');
+			phone.setAttribute('class', 'adoptionLabel');
 			link.setAttribute('class', 'adoptionLabel');
 
 			row1_nameRow.setAttribute('class', 'nameRow');
@@ -132,7 +148,10 @@ var v_ResultView = function(dataArray, elmId) {
 			image.src = list[i].getImage();
 			status.innerHTML = list[i].getStatus();
 			description.innerHTML = list[i].getDescription();
+			email.innerHTML = "Email: " + list[i].getEmail();
+			phone.innerHTML = "Phone: " + list[i].getPhone();
 			link.href = list[i].getLink();
+			link.innerHTML = "Vist PetFinder page";
 			
 			// ---------- Arrange elements ----------
 			row1_nameRow.append(name);
@@ -147,6 +166,8 @@ var v_ResultView = function(dataArray, elmId) {
 
 			row4_descriptionRow.append(description);
 
+			row5_linkRow.append(email);
+			row5_linkRow.append(phone);
 			row5_linkRow.append(link);
 
 			adoptionpost.append(row1_nameRow);
@@ -187,7 +208,7 @@ var initAdoptionResults = function(dataArray) {
 
 		var photo_url = null;
 		if(dataArray[i].primary_photo_cropped!=null){
-			photo_url = dataArray[i].primary_photo_cropped.small;
+			photo_url = dataArray[i].primary_photo_cropped.full;
 		}
 		post.construct(
 			dataArray[i].name,
@@ -198,7 +219,9 @@ var initAdoptionResults = function(dataArray) {
 			photo_url,
 			dataArray[i].status,
 			dataArray[i].description,
-			dataArray[i]._links[0]
+			dataArray[i].contact.email,
+			dataArray[i].contact.phone,
+			dataArray[i].url
 			); 
 		modelArray.push(post);
 	}
