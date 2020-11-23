@@ -5,15 +5,24 @@
 .nameRow {
 	font-weight: bold;
 	text-align: center;
+	margin-bottom: 10px;
 }
 
 .fieldRow {
 	text-align: center;
+	margin-bottom: 10px;
 }
 
 .descriptionRow {
 	margin-left: 10px;
+	float: right;
 } 
+
+.linkRow {
+	margin-left: 10px;
+	float: right;
+	color: blue;
+}
 
 #resultView img {
 	width: 300px;

@@ -149,7 +149,6 @@ h3 {
     margin-top: 20px;
 }
 
-
 label {
     margin: 20px 5px 20px 20px;
     font-family: Roboto-Thin;
@@ -188,3 +187,7 @@ select {
     padding-left: 145px;
     width: 500px;
 } 
+
+#profileView {
+    margin-top: 20px;
+}
