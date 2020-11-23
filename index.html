@@ -1,10 +1,10 @@
 <!-- @Author: Eujin Ko
 @Description: Authentication Demo on firebase with JavaScript https://petshare-92cfa.web.app -->
 
-
 <html>
     <head>
-        <title>Sign Up/In</title>
+        <title>Sign In</title>
+        <link rel="stylesheet" type="text/css" href="loginStyle.css" />
         <!-- The core Firebase JS SDK is always required and must be listed first -->
         <script src="https://www.gstatic.com/firebasejs/7.22.0/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/7.22.0/firebase-auth.js"></script>
@@ -12,17 +12,23 @@
     </head>
 
     <body>
-        <h1> Authentication Demo </h1>
+        <div id="signup">
+            <h1>Sign In</h1>
         <form id="formContainer" method="post">
-            <input type="email" placeholder="email" id="email"/>
-            <input type="password" placeholder="password" id="password"/>
+            <label>Email:</label>
+            <input type="email" id="email"/><br>
+            <label>Password:</label>
+            <input type="password" id="password"/><br>
 
-            <input type="button" value="Sign In" id="signInButn">
-            <input type="button" value="Sign Out" id="signOutButn"><br>
-            <input type="button" value="Sign In With Google" id="signInGoogleButn">
+            <input type="button" onclick="signIn()" value="Sign In" class="button" id="signInButn">
+            <input type="button"  onclick="signOut()" value="Sign Out" class="button" id="signOutButn"><br>
+            <input type="button" onclick="signInGoogleAccount()" value="Sign In With Google" 
+            class="buttonGoogle" id="signInGoogleButn"><br>
+            <a href="SignUpPage.html">Create Account</a>
         </form>
 
-        <a href="SignUpPage.html">sign up a new account</a>
+       
+        </div>
 
     </body>
 

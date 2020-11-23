@@ -1,4 +1,35 @@
 .adoptionLabel {
-	border: 5px solid black;
-	margin: 2px;
+	margin: 8px;
+}
+
+.nameRow {
+	font-weight: bold;
+	text-align: center;
+}
+
+.fieldRow {
+	text-align: center;
+}
+
+.descriptionRow {
+	margin-left: 10px;
+}
+
+#resultView img {
+	width: 300px;
+	height: auto;
+	float: left;
+    display: block;
+}
+
+#resultView {
+	margin: auto;
+	display: grid;
+	grid-template-columns: auto auto;
+}
+
+.adoptionpost {
+	margin: 20px 20px 20px 20px;
+	padding: 10px;
+	box-shadow: 2px 2px 4px 4px rgba(0, 0, 0, 0.05);
 }

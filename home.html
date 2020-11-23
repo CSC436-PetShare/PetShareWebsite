@@ -22,12 +22,16 @@
            <li><a id='adopt' href='adopt.html'>Adoption</a></li>
            <li><a id='shelter' href='shelter.html'>Shelter</a></li>
            <li><a id='profile' href='profile.html'>Profile</a></li>
-           <li><a id='settings' href='settings.html'>Settings</a></li>
         </ul>
 
-        <input type="text" id="composePostField">
-        <input type="file" id= "fileField"  accept="image/png, image/jpeg">
-        <input type="button" id="submitPostButton" value="Submit Post">
+        <div id='createPost'>
+                <h3>Create Post</h3>
+                <input type="file" id= "fileField"  accept="image/png, image/jpeg">
+                <label>Caption:</label>
+                <input type="text" id="composePostField">
+                <input type="button" id="submitPostButton" value="Post" class='button'>
+        </div>
+
 
         <!-- can implement a scroll bar -->
         <div id="postsView"></div>

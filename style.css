@@ -3,10 +3,10 @@
     src: url(Format/Roboto);
 }
 
-
 body {
     margin: 0px;
-    background: transparent;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 img {
@@ -20,6 +20,14 @@ img {
     width: auto;
     height: 100px;
     border: 3px solid #64A9DB;
+}
+
+footer {
+    background-color: #AADBFF;
+    width: auto;
+    height: 50px;
+    border: 3px solid #64A9DB;
+    bottom: 0px;
 }
 
 #title {
@@ -73,8 +81,110 @@ img {
 }
 
 .post {
-    border: 2px solid #ccc;
-    margin: 5px;
-    width: 250px;
+    box-shadow: 2px 2px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 10px 10px 10px 10px;
+    margin: auto;
+    width: 500px;
     word-wrap: break-word;
+    text-align: center;
+    padding: 5px;
+    margin-block-end: 25px;
+} 
+
+.post p {
+    margin: 5px;
+    margin-top: 10px;
+
+}
+
+.post input[type='button'][value='Submit Comment'] {
+    border: none;
+    background-color: #64A9DB;
+    width: 150px;
+    height: 24px;
+    margin: 0px 0px 10px 10px;
+}
+
+.post img {
+    width: 400px;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    float: top;
+    display: block;
+}
+
+#createPost {
+    font-family: Roboto-Thin;
+    text-align: center;
+    box-shadow: 2px 2px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 10px 10px 10px 10px;
+    margin-top: 50px;
+    margin-right: 20px;
+    margin-left: 10px;
+    float: right;
+    width: 300px;
+    padding-bottom: 20px;
+}
+
+h3 {
+    font-family: Roboto-Thin;
+    font-weight: 200;
+    font-size: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #C4C4C4;
+}
+
+#postsView {
+    padding-top: 50px;
+    width: auto;
+}
+
+.button {
+    border: none;
+    background-color: #64A9DB;
+    width: 100px;
+    height: 30px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+
+label {
+    margin: 20px 5px 20px 20px;
+    font-family: Roboto-Thin;
+    font-size: 14pt;
+    width: 30%;
+    text-align: right;
+}
+
+input {
+    border-radius: 0px;
+    border: 1px solid #C4C4C4;
+    height: 20px;
+    margin-top: 20px;
+}
+
+input[value='Adored'] {
+    border: none;
+    background-color: #64A9DB;
+}
+
+select {
+    border-radius: 0px;
+    border: 1px solid #C4C4C4;
+    height: 25px;
+    margin-top: 20px;
+} 
+
+.choices {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#shelterView {
+    margin: auto;
+    margin-top: 40px;
+    padding-left: 145px;
+    width: 500px;
 }

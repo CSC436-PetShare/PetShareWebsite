@@ -2,7 +2,7 @@
 <html>
 
 	<head>
-    	<title>Adoption</title>
+    	<title>Shelters</title>
     	<link rel="stylesheet" type="text/css" href="style.css" />
     	<script type="module" src="scripts/shelter.js"></script>
     	<script type="module" src="scripts/petfinder.js"></script>
@@ -21,12 +21,13 @@
            <li><a id='adopt' href='adopt.html'>Adoption</a></li>
            <li><a id='shelter' href='shelter.html' class='active'>Shelter</a></li>
            <li><a id='profile' href='profile.html'>Profile</a></li>
-           <li><a id='settings' href='settings.html'>Settings</a></li>
         </ul>
-    <label>Choose a location (city, state abbrev.):</label>
-    <select name="location" id="location"></select>
+    <div class='choices'>
+		<label>Choose a location (city, state abbrev.):</label>
+		<select name="location" id="location"></select>
+    </div>
     <div id="shelterView"></div>
   </body>
-        
+         
 	
 </html>
