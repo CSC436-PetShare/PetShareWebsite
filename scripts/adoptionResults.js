@@ -16,11 +16,14 @@ var m_AdoptionPost = function() {
     var _image = "";
     var _status = "";
     var _description = "";
+    var _email = "";
+    var _phone = "";
     var _link = "";
+    var _location = "";
 
     return {
 
-		construct: function(name, breed, size, age, sex, image, status, description, link) {
+		construct: function(name, breed, size, age, sex, image, status, description, email, phone, link, location) {
 			_name = name;
 			_breed = breed;
 			_size = size;
@@ -29,7 +32,10 @@ var m_AdoptionPost = function() {
 			_image = image;
 			_status = status;
 			_description = description;
+			_email = email;
+			_phone = phone;
 			_link = link;
+			_location = location;
 		},
 
 		getName: function() {
@@ -64,8 +70,20 @@ var m_AdoptionPost = function() {
 			return _description;
 		},
 
+		getEmail: function() {
+			return _email;
+		},
+
+		getPhone: function() {
+			return _phone;
+		},
+
 		getLink: function() {
 			return _link;
+		},
+
+		getLocation: function() {
+			return _location;
 		}
     }
 }
@@ -104,7 +122,10 @@ var v_ResultView = function(dataArray, elmId) {
 			var image = document.createElement('img');
 			var status = document.createElement('label');
 			var description = document.createElement('p');
+			var email = document.createElement('p');
+			var phone = document.createElement('p');
 			var link = document.createElement('a');
+			var location = document.createElement('p');
 			
 			// ---------- set attributes ----------
 			name.setAttribute('class', 'adoptionLabel');
@@ -115,7 +136,10 @@ var v_ResultView = function(dataArray, elmId) {
 			image.setAttribute('class', 'adoptionLabel');
 			status.setAttribute('class', 'adoptionLabel');
 			description.setAttribute('class', 'adoptionLabel');
+			email.setAttribute('class', 'adoptionLabel');
+			phone.setAttribute('class', 'adoptionLabel');
 			link.setAttribute('class', 'adoptionLabel');
+			location.setAttribute('class', 'adoptionLabel');
 
 			row1_nameRow.setAttribute('class', 'nameRow');
 			row2_fieldRow.setAttribute('class', 'fieldRow');
@@ -132,7 +156,11 @@ var v_ResultView = function(dataArray, elmId) {
 			image.src = list[i].getImage();
 			status.innerHTML = list[i].getStatus();
 			description.innerHTML = list[i].getDescription();
+			location.innerHTML = "Location: " + list[i].getLocation();
+			email.innerHTML = "Email: " + list[i].getEmail();
+			phone.innerHTML = "Phone: " + list[i].getPhone();
 			link.href = list[i].getLink();
+			link.innerHTML = "Vist PetFinder page";
 			
 			// ---------- Arrange elements ----------
 			row1_nameRow.append(name);
@@ -147,6 +175,9 @@ var v_ResultView = function(dataArray, elmId) {
 
 			row4_descriptionRow.append(description);
 
+			row5_linkRow.append(location);
+			row5_linkRow.append(email);
+			row5_linkRow.append(phone);
 			row5_linkRow.append(link);
 
 			adoptionpost.append(row1_nameRow);
@@ -189,6 +220,9 @@ var initAdoptionResults = function(dataArray) {
 		if(dataArray[i].primary_photo_cropped!=null){
 			photo_url = dataArray[i].primary_photo_cropped.small;
 		}
+		else{
+			photo_url = "../Media/filler.jpg";
+		}
 		post.construct(
 			dataArray[i].name,
 			dataArray[i].breeds[0],
@@ -198,8 +232,11 @@ var initAdoptionResults = function(dataArray) {
 			photo_url,
 			dataArray[i].status,
 			dataArray[i].description,
-			dataArray[i]._links[0]
-			); 
+			dataArray[i].contact.email,
+			dataArray[i].contact.phone,
+			dataArray[i].url,
+			dataArray[i].contact.address.city + ", " + dataArray[i].contact.address.state
+		); 
 		modelArray.push(post);
 	}
 

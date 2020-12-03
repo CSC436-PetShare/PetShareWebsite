@@ -127,7 +127,7 @@ function signIn(email, password){
 
 // Shows pop up which lets the user to sign in with google account
 function signInGoogleAccount(){
-    var provider = new fb.auth.GoogleAuthProvider();
+    var provider = new firebase.auth.GoogleAuthProvider();
 
     auth.signInWithPopup(provider).then(function(result) {
         // This gives you a Google Access Token. You can use it to access the Google API.
@@ -349,7 +349,7 @@ window.addEventListener('DOMContentLoaded', function() {
         b_signInWithGoogleButton.register(theController.dispatch);
     }
     else {
-        var b_signUpButton = signUpButton("signUpButn","email","password", "userName");
+        var b_signUpButton = signUpButton("signUpButn","email","password", "username");
         b_signUpButton.register(theController.dispatch);
     }
 });

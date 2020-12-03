@@ -71,7 +71,7 @@ const client = new petfinder.Client({
 var pet_spec = {
     limit: 5,
     //MAX LIMIT: 50
-    distance: 500,
+    distance: 200,
 }
 
 var animal_attributes;
@@ -168,7 +168,7 @@ var returnAnimalAttributesObject = async function(type){
 
 //Returns the available search limit as an array
 var returnAvailableLimits = async function(){
-    var limit_arr = [5,10,15,20];
+    var limit_arr = [15,25,50,100];
     return limit_arr;
 }
 
