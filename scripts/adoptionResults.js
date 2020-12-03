@@ -164,8 +164,9 @@ var v_ResultView = function(dataArray, elmId) {
 			
 			// ---------- Arrange elements ----------
 			row1_nameRow.append(name);
-
-			row2_fieldRow.append(breed);
+			if(breed != "undefined"){
+				row2_fieldRow.append(breed);
+			}
 			row2_fieldRow.append(size);
 			row2_fieldRow.append(age);
 			row2_fieldRow.append(sex);
@@ -225,7 +226,7 @@ var initAdoptionResults = function(dataArray) {
 		}
 		post.construct(
 			dataArray[i].name,
-			dataArray[i].breeds[0],
+			dataArray[i].breeds.primary,
 			dataArray[i].size,
 			dataArray[i].age,
 			dataArray[i].gender,

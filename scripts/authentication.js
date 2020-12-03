@@ -77,10 +77,18 @@ async function signUpWithEmailAndPassword(email, password, user){
     	 alert("User name cannot have spaces");
     	 return;
     }
+    if(user === "" || user === null ){
+    	alert("Invalid user name try again");
+    	return;
+    }
+    if(user.length < 4){
+    	alert("Your user name is too short. User names should be four letters or longer.");
+    	return;
+    }
     await auth.createUserWithEmailAndPassword(email, password)
     .then(function(result){
     	var _user = "" + user;
-        console.log(_user);
+        //console.log(_user);
         result.user.updateProfile({
             displayName: _user 
         });
